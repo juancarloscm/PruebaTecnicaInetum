@@ -4,6 +4,8 @@ Pipeline de Análisis de Tendencias en la Industria Espacial 🚀
 * Descripción del Proyecto
 Este proyecto implementa un pipeline de datos utilizando la API de Spaceflight News para extraer, procesar y analizar información sobre la industria espacial. Se emplea Google Cloud Composer (Airflow) para orquestar las tareas, BigQuery para almacenamiento y análisis, y Dataproc (Spark) para procesamiento distribuido.
 
+
+
 * Arquitectura
 🛰 Extracción: Datos de artículos, blogs y reportes desde la API de Spaceflight News.
 🛰 Procesamiento: Limpieza, deduplicación y análisis con Apache Spark en Dataproc.
