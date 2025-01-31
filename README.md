@@ -8,7 +8,18 @@ Este proyecto implementa un pipeline de datos utilizando la API de Spaceflight N
 
 * Arquitectura
 🛰 Extracción: Datos de artículos, blogs y reportes desde la API de Spaceflight News.
-🛰 Procesamiento: Limpieza, deduplicación y análisis con Apache Spark en Dataproc.
+
+🛰 Procesamiento: Limpieza, deduplicación y análisis con Apache Spark en Dataproc (Alternativas )
+   -🟢 1. Cloud Functions + Dataproc Jobs (Alternativa Ligera)
+      ✅ Pros: No necesitas Airflow, Se ejecuta solo cuando hay nuevos archivos,Pago por uso (más eficiente que mantener Composer corriendo)
+      ⛔ Contras: No tienes monitoreo y orquestación avanzada como en Airflow
+   -🔵 2. Cloud Run + Dataproc (Para Procesamiento Bajo Demanda)
+      ✅ Pros: Se puede integrar con APIs y otros servicios,Mayor control sobre los triggers,Serverless y flexible
+      ⛔ Contras: Requiere desplegar los servicios en Cloud Run
+   -🔴 3. BigQuery SQL (Si la Transformación es primaria), Se reemplaza Spark por BigQuery  usando SQL avanzado.  
+      ✅ Pros: No se necesita Dataproc ni Airflow,BigQuery es más rápido para consultas SQL sobre grandes volúmenes
+      ⛔ Contras: No es tan flexible como Spark para procesos ETL mas avanzados. pero es una opcion por su integracion embebida con gemini.
+
 🛰 Almacenamiento: Google Cloud Storage (GCS) para datos crudos y BigQuery para análisis estructurado.
 🛰 Orquestación: Cloud Composer (Airflow) para la ejecución automatizada del pipeline.
 🛰 Análisis: Queries en BigQuery para identificar tendencias y fuentes más relevantes.
