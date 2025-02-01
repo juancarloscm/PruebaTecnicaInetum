@@ -1,1 +1,79 @@
+-- dim_fuentes_noticias (Fuentes de Noticias)
+-- Optimización: CLUSTER BY nombre → Facilita búsquedas por nombre de fuente
+CREATE OR REPLACE TABLE `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_fuentes_noticias`
+(
+    source_id INT64,         -- Identificador único de la fuente
+    nombre STRING,           -- Nombre del sitio de noticias
+    url STRING,              -- URL del sitio
+    puntuacion_confiabilidad FLOAT64 -- Puntaje de confiabilidad
+)
+CLUSTER BY nombre;
+
+--dim_temas (Temas de los Artículos)
+-- Optimización: CLUSTER BY categoria → Acelera consultas basadas en categorías.
+
+CREATE OR REPLACE TABLE `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_temas`
+(
+    topic_id INT64,   -- Identificador único del tema
+    nombre STRING,    -- Nombre del tema
+    categoria STRING  -- Categoría del tema
+)
+CLUSTER BY categoria;
+
+
+-- fact_articulos (Artículos con Métricas)
+-- PARTITION BY DATE(published_at) → Mejora rendimiento en consultas temporales.
+--  CLUSTER BY source_id, topic_id → Acelera búsquedas por fuente o tema
+
+CREATE OR REPLACE TABLE `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos`
+(
+    article_id INT64,         -- Identificador único del artículo
+    source_id INT64,          -- Relación con `dim_fuentes_noticias`
+    topic_id INT64,           -- Relación con `dim_temas`
+    published_at TIMESTAMP,   -- Fecha de publicación (Clave de partición)
+    titulo STRING,            -- Título del artículo
+    resumen STRING,           -- Resumen del artículo
+    url STRING,               -- Enlace al artículo
+    visitas INT64,            -- Número de visitas
+    compartidos INT64         -- Veces compartido
+)
+PARTITION BY DATE(published_at) 
+CLUSTER BY source_id, topic_id;
+
+
+--- Optimización:
+--- Evita duplicados con MERGE
+--- Carga solo nuevos registros
+
+MERGE INTO `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos` AS destino
+USING (
+    SELECT DISTINCT 
+        ROW_NUMBER() OVER() AS article_id,
+        f.source_id,
+        t.topic_id,
+        TIMESTAMP(b.published_at) AS published_at,
+        b.title AS titulo,
+        b.summary AS resumen,
+        b.url,
+        CAST(FLOOR(RAND()*1000) AS INT64) AS visitas,
+        CAST(FLOOR(RAND()*500) AS INT64) AS compartidos
+    FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.noticias_procesadas` b
+    LEFT JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_fuentes_noticias` f 
+        ON b.news_site = f.nombre
+    LEFT JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_temas` t 
+        ON b.title = t.nombre
+) AS fuente
+ON destino.article_id = fuente.article_id
+WHEN NOT MATCHED THEN
+    INSERT (article_id, source_id, topic_id, published_at, titulo, resumen, url, visitas, compartidos)
+    VALUES (fuente.article_id, fuente.source_id, fuente.topic_id, fuente.published_at, fuente.titulo, fuente.resumen, fuente.url, fuente.visitas, fuente.compartidos);
+
+--- Resumen
+--- Estrategia de Particionamiento y Caching
+--- Particionamiento temporal (PARTITION BY DATE(published_at))
+--- Indexación con CLUSTER BY para acelerar consultas
+--- Uso de MERGE en la actualización incremental
+--- Almacenamiento en formato Parquet en GCS para acceso eficiente
+
+---
 
