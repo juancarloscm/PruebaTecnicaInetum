@@ -5,11 +5,12 @@ Este pipeline está diseñado para extraer, transformar y cargar datos de la API
 
 Descripcion de Componentes:
 
-API Spaceflight News	Fuente de datos (artículos, blogs, reportes).
-Cloud Composer (Airflow)	Orquestador de tareas que controla la ingesta y procesamiento.
-Cloud Storage (GCS)	Almacenamiento temporal de datos antes de cargarlos en BigQuery.
-BigQuery	Data Warehouse donde se almacena y transforma la información.
-Looker Studio (Opcional)	Visualización y análisis de los datos procesados.
+* API Spaceflight News	Fuente de datos (artículos, blogs, reportes).
+* Cloud Composer (Airflow)	Orquestador de tareas que controla la ingesta y procesamiento.
+* Cloud Storage (GCS)	Almacenamiento temporal de datos antes de cargarlos en BigQuery.
+* BigQuery	Data Warehouse donde se almacena y transforma la información.
+* Looker Studio (Opcional)	Visualización y análisis de los datos procesados.
+
 🔄 1.2. Flujo de Datos
 
 1️⃣ Extraccion de Datos
