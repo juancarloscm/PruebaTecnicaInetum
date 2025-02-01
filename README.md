@@ -1,7 +1,8 @@
-#  Pipeline de Analisis de Tendencias en la Industria Espacial 🚀
-# 🚀 Proyecto: ETL y Análisis de Noticias en GCP
 
-## 📌 Descripcion
+#  Pipeline de Analisis de Tendencias en la Industria Espacial 🚀
+#  Proyecto: ETL y Análisis de Noticias en GCP
+
+## 📌 Descripción
 Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **Google Cloud Platform (GCP)** para extraer datos de la API de **Spaceflight News**, transformarlos con **Apache Spark en Dataproc**, y almacenarlos en **Google BigQuery** para análisis y visualización.
 
 ## ⚙️ Tecnologias Utilizadas
@@ -40,7 +41,7 @@ Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **
 │── README.md  # Documentación
 ```
 
-## 🚀 Flujo del Pipeline
+##  Flujo del Pipeline
 1️⃣ **Extracción de Datos**: Se extraen noticias desde la API de **Spaceflight News**, manejando paginación y rate limits.
 2️⃣ **Almacenamiento en GCS**: Los datos se guardan en formato **JSON y Parquet** en Google Cloud Storage.
 3️⃣ **Procesamiento en Dataproc (Spark)**: Limpieza, deduplicación y análisis de contenido y tendencias.
