@@ -8,44 +8,44 @@ from nltk.tree import Tree
 import json
 
 
-#✅ Explicación de Mejoras en el Código
-#🔹 Análisis de Contenido
-#✔ Extracción de palabras clave con TF-IDF
-#✔ Identificación de entidades (compañías, personas, lugares) usando NLTK
-#✔ Clasificación de artículos por tema con palabras clave
+# Explicacion de Mejoras en el Código
+# Análisis de Contenido
+# Extraccion de palabras clave con TF-IDF
+# Identificacion de entidades (compañias, personas, lugares) usando NLTK
+# Clasificacion de artículos por tema con palabras clave
 
-#🔹 Análisis de Tendencias
-#✔ Detección de tendencias en el tiempo con agrupación por fecha
-#✔ Identificación de fuentes de noticias más activas
+# Análisis de Tendencias
+# Detección de tendencias en el tiempo con agrupación por fecha
+# Identificación de fuentes de noticias más activas
 
 
-# 📌 1️⃣ Inicia sesion de Spark
+# 1. Inicia sesion de Spark
 spark = SparkSession.builder \
     .appName("AnalisisNoticias") \
     .getOrCreate()
 
-# 📌 2️⃣ Configuración de Variables
+# 2. Configuración de Variables
 BUCKET_NAME = "us-central1-flujotransacion-9cfbfa36-bucket"
 RAW_PATH = f"gs://{BUCKET_NAME}/datos_raw/articles.json"
 PROCESSED_PATH = f"gs://{BUCKET_NAME}/datos_procesados/articles_cleaned.parquet"
 BIGQUERY_TABLE = "analitica-contact-center-dev.Entorno_Pruebas_modelo.noticias_procesadas"
 
-# 📌 3️⃣ Cargar Datos desde Cloud Storage
+# 3 Cargar Datos desde Cloud Storage
 df = spark.read.json(RAW_PATH)
 
-# 📌 4️⃣ Limpieza de Datos
+# 3 Limpieza de Datos
 df_cleaned = df.dropDuplicates(["id"]) \
                .filter(col("title").isNotNull()) \
                .withColumnRenamed("news_site", "fuente") \
                .withColumnRenamed("published_at", "fecha_publicacion")
 
-# 📌 5️⃣ Convertir `published_at` a TIMESTAMP
+# 5 Convertir `published_at` a TIMESTAMP
 df_cleaned = df_cleaned.withColumn("fecha_publicacion", col("fecha_publicacion").cast(TimestampType()))
 
-# 📌 6️⃣ Agregar ID Único
+# 6 Agregar ID unico
 df_cleaned = df_cleaned.withColumn("id_articulo", monotonically_increasing_id())
 
-# 📌 7️⃣ Extracción de Palabras Clave con TF-IDF
+# 7. Extraccion de Palabras Clave con TF-IDF
 tokenizer = RegexTokenizer(inputCol="title", outputCol="words", pattern="\\W")
 df_tokenized = tokenizer.transform(df_cleaned)
 
@@ -59,7 +59,7 @@ idf = IDF(inputCol="raw_features", outputCol="features")
 idf_model = idf.fit(df_featurized)
 df_tf_idf = idf_model.transform(df_featurized)
 
-# 📌 8️⃣ Identificación de Entidades (Organizaciones, Personas, Lugares)
+# 8. Identificacion de Entidades (Organizaciones, Personas, Lugares)
 nltk.download('punkt')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
@@ -80,7 +80,7 @@ def extract_entities(text):
 extract_entities_udf = udf(extract_entities, StringType())
 df_entities = df_cleaned.withColumn("entidades", extract_entities_udf(col("title")))
 
-# 📌 9️⃣ Clasificación de Artículos por Tema
+#  9. Clasificacion de Artículos por Tema
 TOPICS = {
     "Ciencia": ["NASA", "SpaceX", "ciencia", "investigación"],
     "Economía": ["mercado", "acciones", "inversión"],
@@ -96,7 +96,7 @@ def classify_article(title):
 classify_udf = udf(classify_article, StringType())
 df_classified = df_cleaned.withColumn("tema", classify_udf(col("title")))
 
-# 📌 🔟 Análisis de Tendencias
+#  10.Analisis de Tendencias
 df_tendencias = df_cleaned.groupBy(date_format("fecha_publicacion", "yyyy-MM-dd").alias("fecha")) \
                           .agg(count("id").alias("total_articulos")) \
                           .orderBy("fecha")
@@ -105,10 +105,10 @@ df_fuentes_activas = df_cleaned.groupBy("fuente") \
                                .agg(count("id").alias("cantidad_articulos")) \
                                .orderBy(col("cantidad_articulos").desc())
 
-# 📌 1️⃣1️⃣ Guardar Datos Limpios en Cloud Storage
+#  Guardar Datos Limpios en Cloud Storage
 df_classified.write.mode("overwrite").parquet(PROCESSED_PATH)
 
-# 📌 1️⃣2️⃣ Cargar Datos a BigQuery
+# Cargar Datos a BigQuery
 df_classified.write \
     .format("bigquery") \
     .option("table", BIGQUERY_TABLE) \
@@ -116,9 +116,9 @@ df_classified.write \
     .mode("overwrite") \
     .save()
 
-print(f"✅ Procesamiento finalizado. Datos guardados en {BIGQUERY_TABLE}")
+print(f" Procesamiento finalizado. Datos guardados en {BIGQUERY_TABLE}")
 
-# 📌 1️⃣3️⃣ Guardar Reportes de Tendencias y Fuentes Más Activas
+# Guardar Reportes de Tendencias y Fuentes Más Activas
 df_tendencias.write.format("bigquery") \
     .option("table", "analitica-contact-center-dev.Entorno_Pruebas_modelo.tendencias_temas") \
     .mode("overwrite").save()
@@ -127,8 +127,8 @@ df_fuentes_activas.write.format("bigquery") \
     .option("table", "analitica-contact-center-dev.Entorno_Pruebas_modelo.fuentes_activas") \
     .mode("overwrite").save()
 
-print(f"✅ Reportes de tendencias y fuentes activas guardados en BigQuery.")
+print(f" Reportes de tendencias y fuentes activas guardados en BigQuery.")
 
-# 📌 1️⃣4️⃣ Finalizar Sesión de Spark
+#  Finaliza sesion de Spark-DataProc
 spark.stop()
 
