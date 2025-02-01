@@ -1,1 +1,6 @@
+# comandos para subirlo en a Cloud Storage desde Cloud sdk-shell
+gsutil cp procesamiento_spark.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
+
+gsutil cp procesamiento_spark_funciones.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
+
 
