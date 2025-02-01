@@ -16,3 +16,4 @@ GROUP BY fuente
 ORDER BY impacto_total DESC
 LIMIT 10;
 
+--- Que medios generan mas impacto
