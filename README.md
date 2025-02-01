@@ -107,6 +107,9 @@ Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo
 ✔ **Orquestación eficiente con Airflow en Cloud Composer**  
 ✔ **Visualización intuitiva en Looker Studio**  
 
+## IDE de Entendimiento del API
+http://190.26.178.21/IDETestGCP/menu.php
+
 
 
 
