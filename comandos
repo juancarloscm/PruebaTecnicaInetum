@@ -1,0 +1,3 @@
+
+-- Entorno de google Shell se copia en bucket de Composer
+gsutil cp Dags_Dinamicos.py gs://us-central1-flujotransacion-9cfbfa36-bucket/dags/
