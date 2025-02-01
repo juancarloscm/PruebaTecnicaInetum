@@ -1,94 +1,113 @@
-Pipeline de Análisis de Tendencias en la Industria Espacial 🚀
+#  Pipeline de Analisis de Tendencias en la Industria Espacial 🚀
+# 🚀 Proyecto: ETL y Análisis de Noticias en GCP
+
+## 📌 Descripcion
+Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **Google Cloud Platform (GCP)** para extraer datos de la API de **Spaceflight News**, transformarlos con **Apache Spark en Dataproc**, y almacenarlos en **Google BigQuery** para análisis y visualización.
+
+## ⚙️ Tecnologias Utilizadas
+- **Google Cloud Composer (Airflow)** - Orquestación del pipeline.
+- **Google Cloud Storage (GCS)** - Almacenamiento intermedio de datos.
+- **Google BigQuery** - Data Warehouse para análisis y reportes.
+- **Google Dataproc (Spark)** - Transformación y procesamiento de datos.
+- **Looker Studio** - Visualización de datos.
+
+## 📁 Estructura del Proyecto
+```
+├── Dags/
+│   ├── Dag_blogs_Biquery_Dinamico # etl_almacen_datos_noticias.py-DAG principal en Airflow
+│── Data_Warehouse_Bigquery/
+│   ├── Fuentes_Noticias_mas_Influyentes.sql  
+│   ├── Tablas.sql  # sql creacion de tablas 
+│   ├── Tendencias_Temas_mes.sql  # sql Tendencias
+│── sql/
+│   ├── Relacion_tablas.sql
+│   ├── dim_fuentes_noticias.sql
+│   ├── dim_temas.sql
+│   ├── noticias_procesadas.sql
+│── scripts/
+│   ├── procesamiento_spark.py  # Transformaciones con Spark en Dataproc
+│── test_Unitarios/
+│   ├── test_conectividad_bigquery.py  # Test de integridad del DAG
+│   ├── test_dag.py  # Test de validación en BigQuery
+│── arquitecturas/
+│   ├── Parte1_Arquitectura_Pipeline
+│   ├── test_bigquery.py  # Test de validación en BigQuery
+│── procesamiento/
+│   ├── comandos.txt  #
+│   ├── procesamiento_spark.py  #
+│   ├── procesamiento_spark_funciones.py  #
+│   ├── procesamiento_spark_optimizado.py  #
+│── README.md  # Documentación
+```
+
+## 🚀 Flujo del Pipeline
+1️⃣ **Extracción de Datos**: Se extraen noticias desde la API de **Spaceflight News**, manejando paginación y rate limits.
+2️⃣ **Almacenamiento en GCS**: Los datos se guardan en formato **JSON y Parquet** en Google Cloud Storage.
+3️⃣ **Procesamiento en Dataproc (Spark)**: Limpieza, deduplicación y análisis de contenido y tendencias.
+4️⃣ **Carga en BigQuery**: Se insertan datos normalizados en un modelo dimensional.
+5️⃣ **Análisis SQL**: Se ejecutan consultas optimizadas para tendencias y reportes.
+6️⃣ **Visualización en Looker Studio**: Se crean dashboards para análisis de datos.
+
+## 🛠 Configuración y Despliegue
+### 1️⃣ Subir el DAG a Composer
+```sh
+gsutil cp dags/etl_almacen_datos_noticias.py gs://us-central1-flujotransacion-9cfbfa36-bucket/dags/
+```
+
+### 2️⃣ Subir Script de Spark a GCS
+```sh
+gsutil cp scripts/procesamiento_spark.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
+```
+
+### 3️⃣ Reiniciar Airflow para Aplicar Cambios
+```sh
+gcloud composer environments restart-web-server flujotransacional --location us-central1
+```
+
+### 4️⃣ Ejecutar el DAG en Airflow
+1. Ir a **Composer → Abrir Airflow**  
+2. Activar y Ejecutar el DAG **`etl_almacen_datos_noticias`**  
+3. Monitorear la ejecución en **BigQuery**  
+
+## 🧪 Tests Unitarios
+Ejecutar pruebas en Airflow y BigQuery:
+```sh
+pytest tests/
+```
+
+## 📊 Análisis SQL
+### 🔹 **Tendencias de temas por mes**
+```sql
+SELECT FORMAT_DATE('%Y-%m', fecha_publicacion) AS mes, nombre, COUNT(*) AS total
+FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos`
+JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_temas`
+ON fact_articulos.topic_id = dim_temas.topic_id
+GROUP BY mes, nombre ORDER BY mes DESC, total DESC;
+```
+
+### 🔹 **Fuentes de noticias mas influyentes**
+```sql
+SELECT f.nombre AS fuente, COUNT(a.article_id) AS total_articulos,
+       SUM(a.visitas) AS total_visitas, SUM(a.compartidos) AS total_compartidos,
+       (SUM(a.visitas) + SUM(a.compartidos)) AS impacto_total
+FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos` a
+JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_fuentes_noticias` f
+ON a.source_id = f.source_id
+GROUP BY fuente
+ORDER BY impacto_total DESC
+LIMIT 10;
+```
+
+## 📈 Visualización en Looker Studio
+Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo y visualizar tendencias en los datos.
+
+## 📌 Conclusión
+✔ **Pipeline optimizado con particionamiento y clustering en BigQuery**  
+✔ **Procesamiento escalable en Dataproc con Apache Spark**  
+✔ **Orquestación eficiente con Airflow en Cloud Composer**  
+✔ **Visualización intuitiva en Looker Studio**  
 
 
-* Descripción del Proyecto
-Este proyecto implementa un pipeline de datos utilizando la API de Spaceflight News para extraer, procesar y analizar información sobre la industria espacial. Se emplea Google Cloud Composer (Airflow) para orquestar las tareas, BigQuery para almacenamiento y análisis, y Dataproc (Spark) para procesamiento distribuido.
 
 
 
-* Arquitectura
-🛰 Extracción: Datos de artículos, blogs y reportes desde la API de Spaceflight News.
-
-🛰 Procesamiento: Limpieza, deduplicación y análisis con Apache Spark en Dataproc (Alternativas )
-   -🟢 1. Cloud Functions + Dataproc Jobs (Alternativa Ligera)
-      ✅ Pros: No necesitas Airflow, Se ejecuta solo cuando hay nuevos archivos,Pago por uso (más eficiente que mantener Composer corriendo)
-      ⛔ Contras: No tienes monitoreo y orquestación avanzada como en Airflow
-   -🔵 2. Cloud Run + Dataproc (Para Procesamiento Bajo Demanda)
-      ✅ Pros: Se puede integrar con APIs y otros servicios,Mayor control sobre los triggers,Serverless y flexible
-      ⛔ Contras: Requiere desplegar los servicios en Cloud Run
-   -🔴 3. BigQuery SQL (Si la Transformación es primaria), Se reemplaza Spark por BigQuery  usando SQL avanzado.  
-      ✅ Pros: No se necesita Dataproc ni Airflow,BigQuery es más rápido para consultas SQL sobre grandes volúmenes
-      ⛔ Contras: No es tan flexible como Spark para procesos ETL mas avanzados. pero es una opcion por su integracion embebida con gemini.
-
-🛰 Almacenamiento: Google Cloud Storage (GCS) para datos crudos y BigQuery para análisis estructurado.
-🛰 Orquestación: Cloud Composer (Airflow) para la ejecución automatizada del pipeline.
-🛰 Análisis: Queries en BigQuery para identificar tendencias y fuentes más relevantes.
-
-* Tecnologías Utilizadas
-🔹 Extracción de datos: Python + Requests + API Spaceflight News
-🔹 Procesamiento: Apache Spark sobre Dataproc
-🔹 Almacenamiento: Google Cloud Storage (GCS) y BigQuery
-🔹 Orquestación: Cloud Composer (Airflow)
-🔹 Análisis SQL: Queries en BigQuery
-
-* Flujo del Pipeline
-1️⃣ Ingesta: DAG de Airflow extrae datos de la API y los guarda en GCS.
-2️⃣ Procesamiento: Job en Dataproc (Spark) limpia, deduplica y clasifica los datos.
-3️⃣ Almacenamiento: Los datos transformados se almacenan en BigQuery.
-4️⃣ Análisis: Queries para tendencias por mes y ranking de fuentes influyentes.
-5️⃣ Automatización: Airflow ejecuta el flujo de trabajo diariamente.
-
-* Instalación y Configuración
-1. Clonar el Repositorio
-bash
-Copiar
-Editar
-git clone https://github.com/tuusuario/spaceflight-pipeline.git
-cd spaceflight-pipeline
-2. Configurar Variables de Entorno
-bash
-Copiar
-Editar
-export PROJECT_ID="tu-proyecto-gcp"
-export BUCKET_NAME="tu-bucket-gcs"
-export BIGQUERY_DATASET="tu-dataset-bigquery"
-export API_URL="https://api.spaceflightnewsapi.net/v4"
-3. Implementar Airflow en Cloud Composer
-Crear un entorno de Cloud Composer en GCP:
-bash
-Copiar
-Editar
-gcloud composer environments create spaceflight-pipeline \
-  --location us-central1 \
-  --image-version composer-2-airflow-2
-Configurar el DAG en Airflow:
-Subir el archivo spaceflight_dag.py al bucket de Cloud Composer:
-bash
-Copiar
-Editar
-gsutil cp dags/spaceflight_dag.py gs://tu-bucket-composer/dags/
-Verificar la ejecución en la interfaz de Cloud Composer.
-4. Ejecutar el Pipeline Manualmente
-bash
-Copiar
-Editar
-gcloud composer environments run spaceflight-pipeline \
-    --location us-central1 trigger_dag -- spaceflight_dag
-Consultas SQL en BigQuery
-
-Ejemplo de consulta para tendencias de temas por mes:
-
-sql
-Copiar
-Editar
-SELECT topic, COUNT(*) as cantidad, DATE_TRUNC(published_at, MONTH) as mes
-FROM `tu-proyecto-gcp.tu-dataset.fact_article`
-GROUP BY topic, mes
-ORDER BY mes DESC, cantidad DESC;
-
-Tareas Pendientes
-☑️ Optimizar particionamiento de BigQuery para mejorar consultas.
-☑️ Implementar dashboard en Looker Studio.
-☑️ Agregar más métricas para evaluar impacto de noticias.
-
-📌 Contacto: juancarloscm@yahoo.com
