@@ -1,1 +1,33 @@
+📌 Parte 1: Arquitectura del Pipeline en GCP (Google Cloud Platform)
+Este pipeline está diseñado para extraer, transformar y cargar datos de la API de Spaceflight News en BigQuery utilizando Cloud Composer (Airflow).
 
+🚀 1.1. Componentes Principales del Pipeline
+
+Descripcion de Componentes:
+
+API Spaceflight News	Fuente de datos (artículos, blogs, reportes).
+Cloud Composer (Airflow)	Orquestador de tareas que controla la ingesta y procesamiento.
+Cloud Storage (GCS)	Almacenamiento temporal de datos antes de cargarlos en BigQuery.
+BigQuery	Data Warehouse donde se almacena y transforma la información.
+Looker Studio (Opcional)	Visualización y análisis de los datos procesados.
+🔄 1.2. Flujo de Datos
+
+1️⃣ Extraccion de Datos
+
+Se consulta la API de Spaceflight News para obtener artículos y blogs.
+Se maneja paginación y rate limits con tenacity.
+Los datos se guardan como archivos JSON/CSV en Cloud Storage.
+
+2️⃣ Procesamiento en BigQuery
+
+Se carga la información desde GCS a BigQuery con GCSToBigQueryOperator.
+Se aplica limpieza y deduplicación (MERGE).
+Se normalizan los datos en un modelo dimensional.
+
+3️⃣ Carga y Modelado en BigQuery
+Se estructuran los datos en tablas de hechos y dimensiones.
+Se particiona por fecha (published_at) para optimizar consultas.
+
+4️⃣ Visualización en Looker Studio (Opcional)
+
+Se crean dashboards para analizar tendencias en los artículos.
