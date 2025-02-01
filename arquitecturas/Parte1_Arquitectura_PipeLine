@@ -13,22 +13,41 @@ Descripcion de Componentes:
 
 🔄 1.2. Flujo de Datos
 
-1️⃣ Extraccion de Datos
+  1️⃣ Extraccion de Datos
 
-Se consulta la API de Spaceflight News para obtener artículos y blogs.
-Se maneja paginación y rate limits con tenacity.
-Los datos se guardan como archivos JSON/CSV en Cloud Storage.
+  Se consulta la API de Spaceflight News para obtener artículos y blogs.
+  Se maneja paginación y rate limits con tenacity.
+  Los datos se guardan como archivos JSON/CSV en Cloud Storage.
 
-2️⃣ Procesamiento en BigQuery
+  2️⃣ Procesamiento en BigQuery
 
-Se carga la información desde GCS a BigQuery con GCSToBigQueryOperator.
-Se aplica limpieza y deduplicación (MERGE).
-Se normalizan los datos en un modelo dimensional.
+  Se carga la información desde GCS a BigQuery con GCSToBigQueryOperator.
+  Se aplica limpieza y deduplicación (MERGE).
+  Se normalizan los datos en un modelo dimensional.
 
-3️⃣ Carga y Modelado en BigQuery
-Se estructuran los datos en tablas de hechos y dimensiones.
-Se particiona por fecha (published_at) para optimizar consultas.
+  3️⃣ Carga y Modelado en BigQuery
+  Se estructuran los datos en tablas de hechos y dimensiones.
+  Se particiona por fecha (published_at) para optimizar consultas.
 
-4️⃣ Visualización en Looker Studio (Opcional)
+  4️⃣ Visualización en Looker Studio (Opcional)
 
-Se crean dashboards para analizar tendencias en los artículos.
+  Se crean dashboards para analizar tendencias en los artículos.
+
+
+1.3. Optimización y Buenas Prácticas
+
+✔ Manejo de Errores y Reintentos
+
+tenacity para manejar rate limits y errores en API.
+try-except en las funciones de extracción.
+
+✔ Estrategia de Almacenamiento en BigQuery
+
+Tablas particionadas por fecha (published_at).
+Uso de MERGE en lugar de INSERT para evitar duplicados.
+
+✔ Monitoreo y Alertas
+
+Logging en Stackdriver para monitorear fallos en Airflow.
+Alertas en Cloud Monitoring en caso de fallos en el DAG.
+
