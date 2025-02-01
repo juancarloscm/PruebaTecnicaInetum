@@ -1,3 +1,42 @@
+✔ Subimos el DAG y los scripts de Spark a Composer
+✔ Reiniciamos Airflow para que detecte los cambios
+✔ Verificamos en la interfaz de Airflow que el DAG aparece correctamente
+
 
 -- Entorno de google Shell se copia en bucket de Composer
 gsutil cp Dags_Dinamicos.py gs://us-central1-flujotransacion-9cfbfa36-bucket/dags/
+
+--1 Abre Cloud Shell en GCP y ejecuta los siguientes comandos:
+export PROJECT_ID="analitica-contact-center-dev"
+export BUCKET_NAME="us-central1-flujotransacion-9cfbfa36-bucket"
+export DAG_NAME="etl_almacen_datos_noticias.py"
+export DAG_FOLDER="dags"
+
+--2 Primero, subimos el DAG a Composer dentro del bucket de GCS:
+gsutil cp $DAG_NAME gs://$BUCKET_NAME/$DAG_FOLDER/
+
+--
+Subir Scripts Adicionales (Procesamiento Spark en Dataproc)
+Si tienes un script de procesamiento en Dataproc, súbelo también:
+
+gsutil cp procesamiento_spark.py gs://$BUCKET_NAME/scripts/
+
+-- 3 Reiniciar el Entorno de Composer para Detectar Cambios
+Ejecuta este comando para forzar que Airflow cargue el nuevo DAG:
+
+gcloud composer environments update flujotransacional \
+    --location us-central1 \
+    --update-pypi-packages-from-file requirements.txt
+-- 4 Si el DAG no aparece en la interfaz de Airflow, reinicia el servicio 
+gcloud composer environments restart-web-server flujotransacional --location us-central1
+
+
+--- Para el Procesamiento
+1. se guarda el  script como procesamiento_spark.py
+2. Se sube a  Cloud Storage con:
+
+gsutil cp procesamiento_spark.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
+Ejecuta el DAG en Cloud Composer para que Dataproc lo procese automáticamente.
+
+
+
