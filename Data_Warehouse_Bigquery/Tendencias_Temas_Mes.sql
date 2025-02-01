@@ -13,3 +13,5 @@ JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_temas` t
 GROUP BY mes, tema
 ORDER BY mes DESC, total_articulos DESC;
 
+-- ¿Cuáles son los temas más populares?
+
