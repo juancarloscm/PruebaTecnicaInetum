@@ -1,6 +1,6 @@
 
 
-#  Pipeline de Analisis de Tendencias en la Industria Espacial 🚀
+#  Pipeline de Analisis de Tendencias en la Industria Espacial 
 #  Proyecto: ETL y Análisis de Noticias en GCP
 
 ## 📌 Descripción
