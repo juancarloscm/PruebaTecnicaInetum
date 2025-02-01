@@ -1,6 +1,18 @@
 # comandos para subirlo en a Cloud Storage desde Cloud sdk-shell
 gsutil cp procesamiento_spark.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
 
-gsutil cp procesamiento_spark_funciones.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
+
+
+# Subo el codigo a GCS
+# Verifico si  Composer lo reconoce
+# Reinicio Airflow para aplicar los cambios
+# Ejecutamos el DAG para validar la ejecucion en Dataproc
+
+gsutil cp procesamiento_spark_optimizado.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
+
+# Reiniciar la instancia
+gcloud composer environments restart-web-server flujotransacional --location us-central1
+
+
 
 
