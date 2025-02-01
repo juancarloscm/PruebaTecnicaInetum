@@ -1,3 +1,8 @@
+-- Optimizacion:
+-- FORMAT_DATE('%Y-%m', fecha_publicacion) → Agrupa los datos por mes.
+-- COUNT(*) → Cuenta cuántos artículos hay por tema en cada mes.
+-- Ordenado por mes y volumen de artículos publicados.
+    
 SELECT 
     FORMAT_DATE('%Y-%m', fecha_publicacion) AS mes,
     t.nombre AS tema,
