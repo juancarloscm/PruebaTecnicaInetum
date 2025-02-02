@@ -30,6 +30,39 @@ ON a.source_id = f.source_id;
 ✅ Usa datos históricos de visitas y compartidos como etiquetas
 ✅ Predice el impacto de nuevos artículos
 
+o un la opcion de este modelo
+✅ predicción al usar normalización y ajustar la métrica de impacto.
+✅ Más precisión con datos adicionales como categoria y duracion_portada.
+✅ Modelo más robusto que no se ve afectado por escalas diferentes en las variables.
+
+CREATE OR REPLACE MODEL 
+    `analitica-contact-center-dev.Entorno_Pruebas_modelo.modelo_prediccion_popularidad`
+OPTIONS(
+    model_type='LINEAR_REG',
+    input_label_cols=['impacto_total']
+) AS
+WITH estadisticas AS (
+    SELECT 
+        AVG(visitas) AS avg_visitas, 
+        STDDEV(visitas) AS stddev_visitas,
+        AVG(compartidos) AS avg_compartidos,
+        STDDEV(compartidos) AS stddev_compartidos
+    FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos`
+)
+SELECT 
+    f.nombre AS fuente,
+    a.titulo,
+    (a.visitas - e.avg_visitas) / e.stddev_visitas AS visitas_norm,  -- Normalización
+    (a.compartidos - e.avg_compartidos) / e.stddev_compartidos AS compartidos_norm,
+    a.duracion_portada,
+    a.categoria,
+    (a.visitas * 0.7 + a.compartidos * 0.3) AS impacto_total
+FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos` a
+JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_fuentes_noticias` f
+ON a.source_id = f.source_id
+CROSS JOIN estadisticas e;  
+
+
 
 🔹 Hacer Predicciones sobre Nuevos Artículos
 SELECT 
