@@ -122,8 +122,7 @@ Arquitectura PIPELINE
 https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf
 
 Modelo Ia-ops
-https://lucid.app/lucidchart/24edc9b0-0500-4c89-b638-271c26d8030d/edit?viewport_loc=-1434%2C74%2C3326%2C1706%2C0_0&invitationId=inv_3207db0e-d71c-4aed-ae84-4c28c28d0e85
-
+Ver PDF
 
 1️⃣ Ingesta de Datos con Cloud Functions
 📌 Objetivo:
