@@ -118,7 +118,7 @@ Este pipeline extrae noticias espaciales de la API de Spaceflight News, las proc
 
 #https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf
 
-![Diagrama:]([https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf])
+![Diagrama:](https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf)
 
 
 
