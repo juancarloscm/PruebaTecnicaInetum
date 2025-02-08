@@ -116,6 +116,8 @@ Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo
 Este pipeline extrae noticias espaciales de la API de Spaceflight News, las procesa y las limpia con Apache Beam (Dataflow), las almacena en BigQuery y las visualiza con Looker Studio.
 
 
+![image](https://github.com/user-attachments/assets/42728783-56dd-4fa9-81d8-3290487bbb6d)
+
                       +------------------------------+
                       |   Spaceflight News API       |
                       +--------------+--------------+
