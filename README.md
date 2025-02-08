@@ -121,45 +121,8 @@ Arquitectura PIPELINE
 
 https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf
 
-
-
-
-                      +------------------------------+
-                      |   Spaceflight News API       |
-                      +--------------+--------------+
-                                     |
-                                     v
-                     +------------------------------+
-                     |    Cloud Functions (ETL)     |
-                     | - Llama API diariamente      |
-                     | - Publica datos en Pub/Sub   |
-                     +--------------+--------------+
-                                     |
-                                     v
-                     +------------------------------+
-                     |        Pub/Sub (Mensajes)    |
-                     | - Cola de procesamiento      |
-                     | - Garantiza escalabilidad    |
-                     +--------------+--------------+
-                                     |
-                                     v
-  +-------------------------------------------+------------------------------------------+
-  |                                           |                                          |
-  |                                           |                                          |
-  v                                           v                                          v
-+--------------------+         +----------------------------+        +------------------------------+
-|   Cloud Storage   |         |  Dataflow (Apache Beam)    |        |  BigQuery (Data Warehouse)   |
-| - Guarda datos    |         | - Filtra y limpia datos    |        | - Almacena datos optimizados |
-| - Backup & Logs   |         | - Deduplicación           |        | - SQL para análisis rápidos  |
-+--------------------+         +----------------------------+        +------------------------------+
-                                                                      |
-                                                                      v
-                                                         +--------------------------+
-                                                         | Looker Studio / DataViz  |
-                                                         | - Dashboards dinámicos   |
-                                                         | - Análisis en tiempo real|
-                                                         +--------------------------+
-
+Modelo Ia-ops
+https://lucid.app/lucidchart/24edc9b0-0500-4c89-b638-271c26d8030d/edit?viewport_loc=-1434%2C74%2C3326%2C1706%2C0_0&invitationId=inv_3207db0e-d71c-4aed-ae84-4c28c28d0e85
 
 
 1️⃣ Ingesta de Datos con Cloud Functions
