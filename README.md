@@ -19,6 +19,7 @@ Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **
 ```
 ├── Dags/
 │   ├── Dag_blogs_Biquery_Dinamico # etl_almacen_datos_noticias.py-DAG principal en Airflow
+│   ├── PipelineSpark # PipelineSpark.py # Automatización del flujo de trabajo, desde la extracción de datos hasta la carga en BigQuery y la generación de insights diarios.
 │── Data_Warehouse_Bigquery/
 │   ├── Fuentes_Noticias_mas_Influyentes.sql  
 │   ├── Tablas.sql  # sql creacion de tablas 
@@ -41,6 +42,9 @@ Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **
 │   ├── procesamiento_spark.py  #
 │   ├── procesamiento_spark_funciones.py  #
 │   ├── procesamiento_spark_optimizado.py  #
+│   ├── limpia_y_deduplica.py  # Herramienta: Apache Spark en Google Cloud Dataproc,Función: Limpieza y deduplicación de datos extraídos (articles, blogs, reports).Almacenamiento: Cloud Storage (cleaned_data.parquet)
+│   ├── proceso_analysis.py  # Herramienta: Apache Spark en Google Cloud Dataproc,Función: Extracción de palabras clave Clasificación por temas (Launch, Rocket, Space) Identificación de compañías y lugares mencionados Almacenamiento: Cloud Storage (analyzed_data.parquet)
+│   ├── identfica__topics.py  # Herramienta: Apache Spark en Google Cloud Dataproc Función: Análisis de tendencias por temas Conteo de menciones de compañías y lugares Almacenamiento: Google BigQuery (topic_trends, company_mentions, place_mentions)
 │── README.md  # Documentación
 ```
 
