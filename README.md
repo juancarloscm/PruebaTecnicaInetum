@@ -49,20 +49,20 @@ Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **
 ```
 
 ##  Flujo del Pipeline
-1️⃣ **Extracción de Datos**: Se extraen noticias desde la API de **Spaceflight News**, manejando paginación y rate limits.
-2️⃣ **Almacenamiento en GCS**: Los datos se guardan en formato **JSON y Parquet** en Google Cloud Storage.
-3️⃣ **Procesamiento en Dataproc (Spark)**: Limpieza, deduplicación y análisis de contenido y tendencias.
-4️⃣ **Carga en BigQuery**: Se insertan datos normalizados en un modelo dimensional.
-5️⃣ **Análisis SQL**: Se ejecutan consultas optimizadas para tendencias y reportes.
-6️⃣ **Visualización en Looker Studio**: Se crean dashboards para análisis de datos.
+- ** 1️⃣ **Extracción de Datos**: Se extraen noticias desde la API de **Spaceflight News**, manejando paginación y rate limits.
+- ** 2️⃣ **Almacenamiento en GCS**: Los datos se guardan en formato **JSON y Parquet** en Google Cloud Storage.
+- ** 3️⃣ **Procesamiento en Dataproc (Spark)**: Limpieza, deduplicación y análisis de contenido y tendencias.
+- ** 4️⃣ **Carga en BigQuery**: Se insertan datos normalizados en un modelo dimensional.
+- ** 5️⃣ **Análisis SQL**: Se ejecutan consultas optimizadas para tendencias y reportes.
+- ** 6️⃣ **Visualización en Looker Studio**: Se crean dashboards para análisis de datos.
 
 ## 🛠 Configuración y Despliegue
-### 1️⃣ Subir el DAG a Composer
+- ** ### 1️⃣ Subir el DAG a Composer
 ```sh
 gsutil cp dags/etl_almacen_datos_noticias.py gs://us-central1-flujotransacion-9cfbfa36-bucket/dags/
 ```
 
-### 2️⃣ Subir Script de Spark a GCS
+- ** ### 2️⃣ Subir Script de Spark a GCS
 ```sh
 gsutil cp scripts/procesamiento_spark.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
 ```
