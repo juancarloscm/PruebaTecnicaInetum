@@ -120,6 +120,15 @@ Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo
 📌 Pipeline Completo en Google Cloud
 Este pipeline extrae noticias espaciales de la API de Spaceflight News, las procesa y las limpia con Apache Beam (Dataflow), las almacena en BigQuery y las visualiza con Looker Studio.
 
+## ⚙️ Tecnologias Utilizadas
+
+1️⃣ Cloud Functions → Ingesta de datos desde la API y publicación en Pub/Sub (100% serverless).
+2️⃣ Pub/Sub → Sistema de mensajería para manejar datos en tiempo real y desacoplar procesos.
+3️⃣ Dataflow (Apache Beam) → Procesa y enriquece los datos (palabras clave, clasificación) antes de enviarlos a BigQuery.
+4️⃣ BigQuery → Almacena y analiza grandes volúmenes de datos, con particionamiento y clustering para consultas rápidas.
+5️⃣ Cloud Composer (Airflow) → Orquesta el pipeline completo, programa tareas y monitorea fallos.
+6️⃣ Google Cloud Natural Language API → Análisis de texto para extraer entidades y temas principales.
+7️⃣ Looker Studio → Dashboards dinámicos para visualizar tendencias y patrones clave.
 
 
 Arquitectura PIPELINE 
