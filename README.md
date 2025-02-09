@@ -8,7 +8,7 @@ Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **
 
 **OPCION 1:**
 
-## ⚙️ Tecnologias Utilizadas
+## ⚙️ Herramientas Utilizadas
 - **Google Cloud Composer (Airflow)** - Orquestación del pipeline.
 - **Google Cloud Storage (GCS)** - Almacenamiento intermedio de datos.
 - **Google BigQuery** - Data Warehouse para análisis y reportes.
@@ -84,27 +84,9 @@ pytest tests/
 ```
 
 ## 📊 Análisis SQL
-### 🔹 **Tendencias de temas por mes**
-```sql
-SELECT FORMAT_DATE('%Y-%m', fecha_publicacion) AS mes, nombre, COUNT(*) AS total
-FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos`
-JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_temas`
-ON fact_articulos.topic_id = dim_temas.topic_id
-GROUP BY mes, nombre ORDER BY mes DESC, total DESC;
-```
+### 🔹 **Tendencias de temas por mes** analisis_tendencias.sql 
 
-### 🔹 **Fuentes de noticias mas influyentes**
-```sql
-SELECT f.nombre AS fuente, COUNT(a.article_id) AS total_articulos,
-       SUM(a.visitas) AS total_visitas, SUM(a.compartidos) AS total_compartidos,
-       (SUM(a.visitas) + SUM(a.compartidos)) AS impacto_total
-FROM `analitica-contact-center-dev.Entorno_Pruebas_modelo.fact_articulos` a
-JOIN `analitica-contact-center-dev.Entorno_Pruebas_modelo.dim_fuentes_noticias` f
-ON a.source_id = f.source_id
-GROUP BY fuente
-ORDER BY impacto_total DESC
-LIMIT 10;
-```
+### 🔹 **Fuentes de noticias mas influyentes** fuentes_mas_influyentes.sql
 
 ## 📈 Visualización en Looker Studio
 Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo y visualizar tendencias en los datos.
