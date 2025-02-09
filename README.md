@@ -6,6 +6,8 @@
 ## 📌 Descripción
 Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **Google Cloud Platform (GCP)** para extraer datos de la API de **Spaceflight News**, transformarlos con **Apache Spark en Dataproc**, y almacenarlos en **Google BigQuery** para análisis y visualización.
 
+**OPCION 1:**
+
 ## ⚙️ Tecnologias Utilizadas
 - **Google Cloud Composer (Airflow)** - Orquestación del pipeline.
 - **Google Cloud Storage (GCS)** - Almacenamiento intermedio de datos.
@@ -109,6 +111,9 @@ Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo
 ✔ **Orquestación eficiente con Airflow en Cloud Composer**  
 ✔ **Visualización intuitiva en Looker Studio**  
 
+
+
+**OPCION 2**
 
 ## Mejora del Modelo
 ## 📌 Descripción
