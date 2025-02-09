@@ -122,21 +122,22 @@ Este pipeline extrae noticias espaciales de la API de Spaceflight News, las proc
 
 ## ⚙️ Tecnologias Utilizadas
 
-1️⃣ Cloud Functions → Ingesta de datos desde la API y publicación en Pub/Sub (100% serverless).
-2️⃣ Pub/Sub → Sistema de mensajería para manejar datos en tiempo real y desacoplar procesos.
-3️⃣ Dataflow (Apache Beam) → Procesa y enriquece los datos (palabras clave, clasificación) antes de enviarlos a BigQuery.
-4️⃣ BigQuery → Almacena y analiza grandes volúmenes de datos, con particionamiento y clustering para consultas rápidas.
-5️⃣ Cloud Composer (Airflow) → Orquesta el pipeline completo, programa tareas y monitorea fallos.
-6️⃣ Google Cloud Natural Language API → Análisis de texto para extraer entidades y temas principales.
-7️⃣ Looker Studio → Dashboards dinámicos para visualizar tendencias y patrones clave.
-
+- ** 1️⃣ Cloud Functions → Ingesta de datos desde la API y publicación en Pub/Sub (100% serverless).
+- ** 2️⃣ Pub/Sub → Sistema de mensajería para manejar datos en tiempo real y desacoplar procesos.
+- ** 3️⃣ Dataflow (Apache Beam) → Procesa y enriquece los datos (palabras clave, clasificación) antes de enviarlos a BigQuery.
+- ** 4️⃣ BigQuery → Almacena y analiza grandes volúmenes de datos, con particionamiento y clustering para consultas rápidas.
+- ** 5️⃣ Cloud Composer (Airflow) → Orquesta el pipeline completo, programa tareas y monitorea fallos.
+- ** 6️⃣ Google Cloud Natural Language API → Análisis de texto para extraer entidades y temas principales.
+- ** 7️⃣ Looker Studio → Dashboards dinámicos para visualizar tendencias y patrones clave.
 
 Arquitectura PIPELINE 
 
 https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf
 
+Inteligencia Artificial utilizada
 Modelo Ia-ops
 Ver PDF
+
 
 1️⃣ Ingesta de Datos con Cloud Functions
 📌 Objetivo:
