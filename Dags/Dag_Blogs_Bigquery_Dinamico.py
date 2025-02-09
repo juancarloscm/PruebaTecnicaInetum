@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 parametros_dag = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2024, 1, 1),
+    'start_date': datetime(2025, 1, 1),
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
@@ -104,7 +104,8 @@ procesar_datos = DataprocSubmitJobOperator(
         "reference": {"project_id": "analitica-contact-center-dev"},
         "placement": {"cluster_name": "cluster-temporal"},
         "pyspark_job": {
-            "main_python_file_uri": f"gs://{BUCKET_NAME}/scripts/procesamiento_spark.py"
+            #"main_python_file_uri": f"gs://{BUCKET_NAME}/scripts/procesamiento_spark.py"
+            #"main_python_file_uri": f"gs://{BUCKET_NAME}/scripts/procesamiento_spark.py"
         }
     },
     dag=flujo_datos,
