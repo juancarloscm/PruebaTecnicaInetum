@@ -210,12 +210,12 @@ def main(request):
     log_event("🎯 Ingesta completada para todos los endpoints.")
     return "✅ Ingesta finalizada."
 
-🔹 Mejoras Implementadas
-1️⃣ Sistema de Paginación Eficiente: La función obtener_datos gestiona la paginación automática con el campo next de la API.
-2️⃣ Manejo de Rate Limits: Si se recibe el código 429 (rate limit), el sistema espera 5 segundos y vuelve a intentar la solicitud.
-3️⃣ Deduplicación de Artículos: Se utiliza un conjunto (set) de IDs para evitar duplicados al recopilar datos.
-4️⃣ Sistema de Logs: Cada acción importante se registra con un timestamp para facilitar la auditoría y depuración.
-5️⃣ Código preparado para Tests Unitarios: Las funciones son modulares y reutilizables, lo que facilita la creación de tests.
+- ** 🔹 Mejoras Implementadas
+- ** 1️⃣ Sistema de Paginación Eficiente: La función obtener_datos gestiona la paginación automática con el campo next de la API.
+- ** 2️⃣ Manejo de Rate Limits: Si se recibe el código 429 (rate limit), el sistema espera 5 segundos y vuelve a intentar la solicitud.
+- ** 3️⃣ Deduplicación de Artículos: Se utiliza un conjunto (set) de IDs para evitar duplicados al recopilar datos.
+- ** 4️⃣ Sistema de Logs: Cada acción importante se registra con un timestamp para facilitar la auditoría y depuración.
+- ** 5️⃣ Código preparado para Tests Unitarios: Las funciones son modulares y reutilizables, lo que facilita la creación de tests.
 
 📌 ¿Cómo sería un Test Unitario para esta función?
 test unitario para la función obtener_datos utilizando unittest.
