@@ -346,36 +346,74 @@ Ver PDF
 - ** Particiona por fecha (published_at) para reducir el volumen escaneado.
 - ** Clustering: Clustering por category y news_site para mejorar el rendimiento.
 
-## 🎯 Objetivo del Plan de Contingencia
-- ** Identificar riesgos críticos que puedan afectar el pipeline.
-- ** Implementar medidas preventivas y correctivas para mitigar los riesgos.
-- ** Definir procedimientos de recuperación rápida en caso de fallo.
-- ** 🛠️ 1. Identificación de Riesgos
-- **        Aquí están los riesgos más relevantes para tu pipeline:
+# Plan de Contingencia para el Pipeline de Datos
 
-- **        Riesgo	Descripción	Impacto
-- **        Fallo en la extracción de datos	La API no responde o cambia su estructura.	Alto
-- **        Pérdida de datos en Cloud Storage	Archivos borrados o corrompidos.	Alto
-- **        Fallo en Dataproc (Spark)	Error en la ejecución de tareas o falta de recursos.	Medio
-- **        Fallo en la carga a BigQuery	Datos incompletos o errores de formato.	Alto
-- **        Error en la automatización (Airflow)	DAGs fallidos o problemas de conectividad.	Medio
-- **🛡️ 2. Estrategia de Mitigación y Procedimientos Correctivos
-- **       a. Backup y Recuperación
-- **          Backup Diario en Cloud Storage:
-- **          Automatizado mediante Airflow y Cloud Scheduler.
-- **          Respalda datos intermedios y tablas de BigQuery.
-- ** Plan de Restauración:
-- **  Restaurar datos desde el backup más reciente en caso de pérdida (como explicamos en el DAG data_recovery_pipeline).
-- **       b. Redundancia y Alta Disponibilidad
-- **          Google Cloud Storage asegura alta disponibilidad con múltiples réplicas.
-- **          BigQuery es una plataforma sin servidor con redundancia interna.
-- **       c. Monitoreo y Alertas (Cloud Monitoring)
-- **          Configura Google Cloud Monitoring para detectar fallos en el pipeline.
-- **          Notificaciones en tiempo real: Por correo, Slack o Google Chat.
-- **          Política de alertas personalizadas basada en:
-- **          Tiempo de ejecución prolongado.
-- **          Errores en Dataproc o BigQuery.
+## 📌 Objetivo del Plan
+El objetivo de este plan de contingencia es garantizar la continuidad operativa del pipeline de datos, minimizando el tiempo de inactividad y reduciendo el riesgo de pérdida de datos. Esto se logra mediante la identificación de riesgos, la implementación de medidas preventivas, y la definición de procedimientos claros para la recuperación rápida.
 
+## ⚠️ Identificación de Riesgos
+A continuación, se describen los principales riesgos que podrían afectar el pipeline de datos:
+
+| **Riesgo**                        | **Descripción**                                        | **Impacto**  |
+|------------------------------------|--------------------------------------------------------|--------------|
+| Fallo en la extracción de datos    | La API no responde o cambia su estructura.             | Alto         |
+| Pérdida de datos en Cloud Storage  | Archivos borrados o corrompidos.                       | Alto         |
+| Fallo en Dataproc (Spark)          | Error en la ejecución de tareas o falta de recursos.   | Medio        |
+| Fallo en la carga a BigQuery       | Datos incompletos o errores de formato.                | Alto         |
+| Error en la automatización (Airflow)| DAGs fallidos o problemas de conectividad.             | Medio        |
+
+## 🛡️ Medidas Preventivas y Correctivas
+
+### 🔄 Backup y Recuperación
+- **Backup Diario en Cloud Storage:** Respaldo automatizado de datos intermedios y tablas de BigQuery.
+- **Plan de Restauración:** Restaurar datos desde el backup más reciente en caso de pérdida.
+
+### ⚙️ Redundancia y Alta Disponibilidad
+- **Google Cloud Storage:** Múltiples réplicas para asegurar alta disponibilidad.
+- **BigQuery:** Redundancia interna para datos estructurados.
+
+### 📈 Monitoreo y Alertas (Cloud Monitoring)
+- Configuración de alertas para detectar fallos en el pipeline.
+- Notificaciones en tiempo real por correo, Slack o Google Chat.
+- Políticas de alertas personalizadas basadas en tiempo de ejecución y errores críticos.
+
+## 🚨 Procedimientos de Recuperación
+
+### Escenario 1: Fallo en la extracción de datos (API no responde)
+- **Acción inmediata:** Detener el DAG y reintentar después de 5 minutos.
+- **Fallback:** Notificar al equipo y recuperar datos de una fuente alternativa si está disponible.
+
+### Escenario 2: Pérdida de datos en Cloud Storage
+- **Acción inmediata:** Restaurar los datos desde el backup más reciente.
+- **Prevención:** Habilitar Object Versioning en Cloud Storage.
+
+### Escenario 3: Fallo en Dataproc (Spark)
+- **Acción inmediata:** Reintentar el trabajo hasta 3 veces.
+- **Fallback:** Escalar el cluster de Dataproc o reprogramar la tarea.
+
+### Escenario 4: Error en la carga a BigQuery
+- **Acción inmediata:** Corregir el formato de datos y reintentar la carga.
+- **Prevención:** Validación previa del esquema de datos antes de cargar.
+
+## 👥 Roles y Responsabilidades
+
+| **Rol**               | **Responsabilidad**                                      |
+|-----------------------|---------------------------------------------------------|
+| Equipo de Datos       | Gestión y recuperación de datos.                         |
+| Equipo de DevOps      | Monitoreo y soporte del entorno de ejecución.             |
+| Gerencia              | Evaluación del impacto y toma de decisiones estratégicas. |
+
+## 🔍 Resumen Visual del Plan
+Un diagrama de flujo que ilustra el proceso del plan de contingencia, desde la identificación de un fallo hasta la restauración de datos.
+
+---
+### 🗂️ Diagrama (sugerido):
+1. **Detección de error** → 2. **Verificación de backups** → 3. **Restauración automática** → 4. **Notificación al equipo** → 5. **Reanudación del pipeline**
+
+---
+
+## 📋 Conclusión
+Este plan de contingencia establece una estrategia integral para asegurar la continuidad del pipeline de datos. Las medidas descritas minimizan el impacto de los fallos y garantizan la rápida recuperación del sistema, manteniendo la integridad y disponibilidad de los datos.
 
 
 
