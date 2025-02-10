@@ -276,75 +276,71 @@ Inteligencia Artificial utilizada
 Modelo Ia-ops
 Ver PDF
 
-##  Sistema de Backup y Recuperación
-- ** Backup de datos críticos (almacenados en Cloud Storage, BigQuery, y metadatos del pipeline).
-- ** Automatización de backups periódicos.
-- ** Recuperación rápida en caso de fallo o pérdida de datos.
+# 📦 Sistema de Recuperación y Backup para el Pipeline de Datos
 
-## 📊 Resumen de la Arquitectura de Backup
-- ** Cloud Storage para respaldar datos intermedios y JSON de entrada.
-- ** BigQuery Export para respaldar tablas finales.
-- ** Cloud Scheduler para ejecutar tareas automáticas.
-- ** Google Cloud Monitoring para detectar y alertar sobre errores.
+## 📌 **Objetivo**
+Garantizar la disponibilidad de datos y la continuidad operativa del pipeline mediante un sistema de recuperación rápida y backups automáticos.
+
+---
+## ⚠️ **Identificación de Riesgos**
+| **Riesgo**                        | **Descripción**                                        |
+|------------------------------------|--------------------------------------------------------|
+| Fallo en la extracción de datos    | La API no responde o cambia su estructura.             |
+| Pérdida de datos en Cloud Storage  | Archivos borrados o corrompidos.                       |
+| Fallo en Dataproc (Spark)          | Error en la ejecución de tareas o falta de recursos.   |
+| Fallo en la carga a BigQuery       | Datos incompletos o errores de formato.                |
+| Error en la automatización (Airflow)| DAGs fallidos o problemas de conectividad.             |
+
+---
+## 🛡️ **Estrategia de Backup y Recuperación**
+
+### 🔄 **Backup Automático**
+1. **Cloud Storage:** Backup diario de datos intermedios (`cleaned_data.parquet`) y JSON originales.
+2. **BigQuery:** Exportación de tablas procesadas (`topic_trends`, `company_mentions`, `place_mentions`) en formato Parquet.
+3. **Automatización con Airflow:** Las tareas de backup se ejecutan automáticamente mediante DAGs.
+
+### ⚙️ **Restauración de Datos**
+1. **Cloud Storage:** Restauración desde el backup más reciente.
+2. **BigQuery:** Importación de datos respaldados en formato Parquet.
+3. **Fallback Automático:** DAG de recuperación en Airflow que se activa si una tarea crítica falla.
+
+---
+## 🧑‍💻 **Procedimientos de Recuperación**
+
+### 1️⃣ **Fallo en la extracción de datos (API no responde)**
+- **Acción:** Reintentar la tarea después de 5 minutos.
+- **Fallback:** Recuperar datos de una fuente alternativa si está disponible.
+
+### 2️⃣ **Pérdida de datos en Cloud Storage**
+- **Acción:** Restaurar desde el backup más reciente.
+- **Prevención:** Activar Object Versioning en Cloud Storage para mantener versiones anteriores.
+
+### 3️⃣ **Fallo en Dataproc (Spark)**
+- **Acción:** Reintentar el trabajo hasta 3 veces.
+- **Fallback:** Escalar el cluster de Dataproc o reprogramar la tarea.
+
+### 4️⃣ **Error en la carga a BigQuery**
+- **Acción:** Corregir el formato de datos y reintentar.
+- **Prevención:** Validar el esquema de datos antes de cargar.
+
+---
+## 📈 **Monitoreo y Alertas**
+1. **Google Cloud Monitoring:** Detecta fallos críticos y notifica en tiempo real.
+2. **Alertas personalizadas:** Por correo, Slack o Google Chat.
+3. **Notificaciones Automáticas:** Activación de alertas en Airflow mediante `TriggerDagRunOperator`.
+
+---
+## 📊 **Visualización del Sistema**
+### Resumen del Flujo de Backup y Recuperación:
+1. **Backup Automático Diario** → 2. **Monitoreo Continuo** → 3. **Detección de Fallos** → 4. **Restauración Automática** → 5. **Notificación al Equipo**
+
+---
+## ✅ **Conclusión**
+El sistema de recuperación y backup garantiza la continuidad operativa del pipeline de datos, reduciendo el riesgo de pérdida y tiempos de recuperación. La combinación de Cloud Storage, BigQuery y Airflow permite una solución escalable y confiable.
 
 
- ## 🛠 Estrategia de Implementación
-- ** 1. Backup en Google Cloud Storage
-- ** 📦 Datos a respaldar:
-- ** Datos intermedios (cleaned_data.parquet, analyzed_data.parquet).
-- ** Archivos JSON de entrada (articles.json, blogs.json).
-- ** 💡 Cómo implementarlo:
-- ** Configura versiones de objetos en tu bucket (Object Versioning).
-- ** Automatiza los backups con un script y programa la tarea en Cloud Scheduler.
-
-- ** 2. Backup de BigQuery
-- ** 📦 Datos a respaldar:
-- ** Tablas finales (topic_trends, company_mentions, place_mentions).
-- ** 💡 Cómo implementarlo:
-- ** Exporta las tablas a Cloud Storage en formato Avro o Parquet.
-
-- ** 3. Recuperación de Datos
-- ** Datos en Cloud Storage:
-- ** Si tienes versiones anteriores, puedes restaurarlas directamente.
-- **  gsutil cp gs://buckets-aws-backup/processed_data_20250201 gs://buckets-aws/processed_data
-
-- ** Datos en BigQuery:
-- ** Si las tablas se perdieron, puedes volver a importarlas desde el backup en Cloud Storage.
-- ** bq load \
-- **   --source_format=PARQUET \
-- **  "analitica-contact-center-dev:pos_analitica_ANALISIS.topic_trends" \
-- **  "gs://buckets-aws-backup/bigquery/topic_trends_20250201.parquet"
-
-- ** 4. Monitorización y Alertas
-- ** Se Configura Google Cloud Monitoring para recibir alertas en caso de:
-- ** Fallos en las tareas de backup.
-- ** Falta de espacio en Cloud Storage.
-- ** Fallos de importación en BigQuery.
-
-## Objetivo del DAG de Airflow:
-- ** Backup de datos intermedios y tablas de BigQuery.
-- ** Almacenar los backups en Cloud Storage.
-- ** Automatización diaria para mantener los datos respaldados y seguros.
-- ** Restauración manual en caso de fallo.
-
-----------------------------
-🛠 2. Estrategia de Almacenamiento y Búsqueda
-- ** a. Almacenamiento
-- ** Herramientas:
-
-- ** Google Cloud Storage (intermedios y backups)
-- ** Google BigQuery (datos estructurados para consultas rápidas)
-- ** Formato recomendado:
-- ** JSON para almacenamiento bruto (backup).
-- ** Parquet para datos procesados y comprimidos (más eficiente para análisis en BigQuery y Spark).
 
 
-- ** b. Estrategia de Búsqueda
-- ** 1. Google BigQuery (para consultas avanzadas):
-
-- ** Consulta rápida: Usa índices y particiones en BigQuery para acelerar las consultas.
-- ** Particiona por fecha (published_at) para reducir el volumen escaneado.
-- ** Clustering: Clustering por category y news_site para mejorar el rendimiento.
 
 # Plan de Contingencia para el Pipeline de Datos
 
