@@ -15,6 +15,7 @@ El agente está desplegado en **Cloud Run** y se activa mediante eventos de **Pu
 3. **BigQuery:** Fuente de datos para el análisis.
 4. **Google Cloud Natural Language:** Enriquecimiento del texto mediante la identificación de palabras clave y entidades.
 5. **GPT (OpenAI):** Análisis avanzado y generación de respuestas.
+6. **Looker Studio:** Visualización en tiempo real de resultados.
 
 ### **Flujo de Trabajo:**
 1. **Ingesta y Limpieza:** Obtención de datos desde BigQuery.
@@ -90,11 +91,16 @@ def recibir_evento():
 
     # Paso 4: Decisiones y acciones automáticas
     if "alerta" in respuesta_gpt.lower():
-        print("⚠️ Alerta detectada. Enviando notificación...")
+        print("⚠️ Alerta detectada. Enviando notificación por correo...")
+        enviar_alerta("Alerta detectada en el análisis de tendencias.")
     else:
         print("✅ Todo está en orden.")
 
     return jsonify({"status": "OK", "message": "Evento procesado correctamente"})
+
+# Función para enviar alerta por correo (simulada)
+def enviar_alerta(mensaje):
+    print(f"✉️ Enviando alerta: {mensaje}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
@@ -151,5 +157,8 @@ gcloud logs read --service=agente-autonomo
 ```
 
 ---
-
-
+## ✨ Próximos Pasos
+- **Integrar alertas reales por correo o Slack** utilizando **Cloud Functions** para notificar al equipo en tiempo real sobre eventos críticos.
+- **Desplegar modelos personalizados en Vertex AI**, entrenados con datos históricos, para realizar **predicciones más precisas y adaptativas**.
+- **Implementar detección automática de anomalías** usando **BigQuery ML y Vertex AI**, ayudando a identificar patrones inusuales en tiempo real.
+- **Optimizar el rendimiento del agente** mediante el uso de **particiones y consultas materializadas en BigQuery**, reduciendo costos y mejorando la velocidad de respuesta.
