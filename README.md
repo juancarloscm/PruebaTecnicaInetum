@@ -54,111 +54,6 @@ Este proyecto implementa un pipeline de **ETL (Extract, Transform, Load)** en **
 - ** 5️⃣ **Análisis SQL**: Se ejecutan consultas optimizadas para tendencias y reportes.
 - ** 6️⃣ **Visualización en Looker Studio**: Se crean dashboards para análisis de datos.
 
-## 🛠 Configuración y Despliegue
-- ** ### 1️⃣ Subir el DAG a Composer
-```sh
-gsutil cp dags/etl_almacen_datos_noticias.py gs://us-central1-flujotransacion-9cfbfa36-bucket/dags/
-```
-
-- ** ### 2️⃣ Subir Script de Spark a GCS
-```sh
-gsutil cp scripts/procesamiento_spark.py gs://us-central1-flujotransacion-9cfbfa36-bucket/scripts/
-```
-
-### 3️⃣ Reiniciar Airflow para Aplicar Cambios
-```sh
-gcloud composer environments restart-web-server flujotransacional --location us-central1
-```
-
-### 4️⃣ Ejecutar el DAG en Airflow
-1. Ir a **Composer → Abrir Airflow**  
-2. Activar y Ejecutar el DAG **`etl_almacen_datos_noticias`**  
-3. Monitorear la ejecución en **BigQuery**  
-
-
-# 🧪 Test Unitarios para el Pipeline de Datos
-
-## 📌 **Objetivo**
-Garantizar la calidad y el correcto funcionamiento del pipeline mediante la ejecución de test unitarios en las funciones clave. Esto asegura que cada módulo individual funcione como se espera y facilita la detección temprana de errores.
-
----
-## 🛠️ **Áreas de Prueba**
-Los test unitarios cubren las siguientes áreas clave del pipeline:
-
-| **Módulo**                 | **Descripción del Test**                                    |
-|----------------------------|-------------------------------------------------------------|
-| Extracción de datos         | Verifica la conexión y respuesta de la API.                  |
-| Limpieza y deduplicación   | Asegura que no existan registros duplicados y que se eliminen columnas innecesarias. |
-| Análisis de palabras clave | Comprueba la correcta extracción de las palabras más frecuentes. |
-| Clasificación de artículos  | Verifica la asignación correcta de categorías (`Launch`, `Rocket`, `Space`). |
-| Carga a BigQuery           | Asegura que el esquema de datos sea compatible y la carga se realice sin errores. |
-
----
-## 🧑‍💻 **Ejemplos de Test Unitarios**
-
-### 1️⃣ **Test de Extracción de Datos**
-```python
-import unittest
-import requests
-
-class TestDataExtraction(unittest.TestCase):
-    def test_api_response(self):
-        response = requests.get("https://api.spaceflightnewsapi.net/v4/articles")
-        self.assertEqual(response.status_code, 200, "La API no responde correctamente.")
-
-if __name__ == '__main__':
-    unittest.main()
-```
-**Descripción:** Verifica que la API responda con un código `200` (OK).
-
----
-### 2️⃣ **Test de Limpieza y Deduplicación**
-```python
-import unittest
-from pyspark.sql import SparkSession
-
-class TestDataCleaning(unittest.TestCase):
-    def setUp(self):
-        self.spark = SparkSession.builder.appName("TestCleaning").getOrCreate()
-        self.data = [(1, "Article 1"), (1, "Article 1"), (2, "Article 2")]
-        self.df = self.spark.createDataFrame(self.data, ["id", "title"])
-
-    def test_remove_duplicates(self):
-        cleaned_df = self.df.dropDuplicates(["id"])
-        self.assertEqual(cleaned_df.count(), 2, "Eliminación de duplicados fallida.")
-
-if __name__ == '__main__':
-    unittest.main()
-```
-**Descripción:** Verifica que el proceso de limpieza elimine correctamente los registros duplicados.
-
----
-### 3️⃣ **Test de Clasificación de Artículos**
-```python
-import unittest
-from classify import classify_article  # Supongamos que esta función clasifica artículos
-
-class TestClassification(unittest.TestCase):
-    def test_classification(self):
-        self.assertEqual(classify_article("This is a rocket launch"), "Launch", "Clasificación incorrecta.")
-        self.assertEqual(classify_article("Space mission to Mars"), "Space", "Clasificación incorrecta.")
-
-if __name__ == '__main__':
-    unittest.main()
-```
-**Descripción:** Verifica que la función de clasificación asigne la categoría correcta.
-
----
-## 📦 **Estrategia de Ejecución**
-1. **Automatización:** Los test unitarios se ejecutan automáticamente en cada nueva versión del pipeline utilizando un sistema de integración continua (CI/CD).
-2. **Frecuencia:** Ejecución diaria o en cada cambio significativo en el código.
-3. **Resultados:** Los resultados se registran y notifican al equipo.
-
----
-## ✅ **Conclusión**
-Los test unitarios son una parte esencial para mantener la calidad del pipeline de datos. Detectan errores tempranamente, aseguran la estabilidad del sistema y facilitan el mantenimiento a largo plazo.
-
-
 
 # 📊 Análisis de Datos del Pipeline
 
@@ -251,30 +146,91 @@ ORDER BY total_articles DESC;
 ## ✅ **Conclusión**
 El análisis de datos del pipeline proporciona insights valiosos para comprender mejor las tendencias, detectar patrones clave y mejorar la toma de decisiones. Las herramientas utilizadas, como BigQuery y Data Studio, permiten realizar consultas rápidas y visualizar los resultados de manera efectiva.
 
-**OPCION 2**
+# 🧪 Test Unitarios para el Pipeline de Datos
 
-## Propuesta de Mejora del Modelo con 100% serveless
-## 📌 Descripción
-📌 Pipeline Completo en Google Cloud
-Este pipeline extrae noticias espaciales de la API de Spaceflight News, las procesa y las limpia con Apache Beam (Dataflow), las almacena en BigQuery y las visualiza con Looker Studio.
+## 📌 **Objetivo**
+Garantizar la calidad y el correcto funcionamiento del pipeline mediante la ejecución de test unitarios en las funciones clave. Esto asegura que cada módulo individual funcione como se espera y facilita la detección temprana de errores.
 
-## ⚙️ Tecnologias Utilizadas
+---
+## 🛠️ **Áreas de Prueba**
+Los test unitarios cubren las siguientes áreas clave del pipeline:
 
-- ** 1️⃣ Cloud Functions → Ingesta de datos desde la API y publicación en Pub/Sub (100% serverless).
-- ** 2️⃣ Pub/Sub → Sistema de mensajería para manejar datos en tiempo real y desacoplar procesos.
-- ** 3️⃣ Dataflow (Apache Beam) → Procesa y enriquece los datos (palabras clave, clasificación) antes de enviarlos a BigQuery.
-- ** 4️⃣ BigQuery → Almacena y analiza grandes volúmenes de datos, con particionamiento y clustering para consultas rápidas.
-- ** 5️⃣ Cloud Composer (Airflow) → Orquesta el pipeline completo, programa tareas y monitorea fallos.
-- ** 6️⃣ Google Cloud Natural Language API → Análisis de texto para extraer entidades y temas principales.
-- ** 7️⃣ Looker Studio → Dashboards dinámicos para visualizar tendencias y patrones clave.
+| **Módulo**                 | **Descripción del Test**                                    |
+|----------------------------|-------------------------------------------------------------|
+| Extracción de datos         | Verifica la conexión y respuesta de la API.                  |
+| Limpieza y deduplicación   | Asegura que no existan registros duplicados y que se eliminen columnas innecesarias. |
+| Análisis de palabras clave | Comprueba la correcta extracción de las palabras más frecuentes. |
+| Clasificación de artículos  | Verifica la asignación correcta de categorías (`Launch`, `Rocket`, `Space`). |
+| Carga a BigQuery           | Asegura que el esquema de datos sea compatible y la carga se realice sin errores. |
 
-Arquitectura PIPELINE 
+---
+## 🧑‍💻 **Ejemplos de Test Unitarios**
 
-https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf
+### 1️⃣ **Test de Extracción de Datos**
+```python
+import unittest
+import requests
 
-Inteligencia Artificial utilizada
-Modelo Ia-ops
-Ver PDF
+class TestDataExtraction(unittest.TestCase):
+    def test_api_response(self):
+        response = requests.get("https://api.spaceflightnewsapi.net/v4/articles")
+        self.assertEqual(response.status_code, 200, "La API no responde correctamente.")
+
+if __name__ == '__main__':
+    unittest.main()
+```
+**Descripción:** Verifica que la API responda con un código `200` (OK).
+
+---
+### 2️⃣ **Test de Limpieza y Deduplicación**
+```python
+import unittest
+from pyspark.sql import SparkSession
+
+class TestDataCleaning(unittest.TestCase):
+    def setUp(self):
+        self.spark = SparkSession.builder.appName("TestCleaning").getOrCreate()
+        self.data = [(1, "Article 1"), (1, "Article 1"), (2, "Article 2")]
+        self.df = self.spark.createDataFrame(self.data, ["id", "title"])
+
+    def test_remove_duplicates(self):
+        cleaned_df = self.df.dropDuplicates(["id"])
+        self.assertEqual(cleaned_df.count(), 2, "Eliminación de duplicados fallida.")
+
+if __name__ == '__main__':
+    unittest.main()
+```
+**Descripción:** Verifica que el proceso de limpieza elimine correctamente los registros duplicados.
+
+---
+### 3️⃣ **Test de Clasificación de Artículos**
+```python
+import unittest
+from classify import classify_article  # Supongamos que esta función clasifica artículos
+
+class TestClassification(unittest.TestCase):
+    def test_classification(self):
+        self.assertEqual(classify_article("This is a rocket launch"), "Launch", "Clasificación incorrecta.")
+        self.assertEqual(classify_article("Space mission to Mars"), "Space", "Clasificación incorrecta.")
+
+if __name__ == '__main__':
+    unittest.main()
+```
+**Descripción:** Verifica que la función de clasificación asigne la categoría correcta.
+
+---
+## 📦 **Estrategia de Ejecución**
+1. **Automatización:** Los test unitarios se ejecutan automáticamente en cada nueva versión del pipeline utilizando un sistema de integración continua (CI/CD).
+2. **Frecuencia:** Ejecución diaria o en cada cambio significativo en el código.
+3. **Resultados:** Los resultados se registran y notifican al equipo.
+
+---
+## ✅ **Conclusión**
+Los test unitarios son una parte esencial para mantener la calidad del pipeline de datos. Detectan errores tempranamente, aseguran la estabilidad del sistema y facilitan el mantenimiento a largo plazo.
+
+
+
+
 
 # 📦 Sistema de Recuperación y Backup para el Pipeline de Datos
 
@@ -478,6 +434,31 @@ Identificar mejoras clave para optimizar el rendimiento, escalabilidad y funcion
 ---
 ## ✅ **Conclusión**
 Estas mejoras aseguran un pipeline más escalable, eficiente y alineado con las necesidades futuras del proyecto. La implementación gradual permitirá maximizar el valor de los datos y optimizar los recursos.
+
+**OPCION 2**
+
+## Propuesta de Mejora del Modelo con 100% serveless
+## 📌 Descripción
+📌 Pipeline Completo en Google Cloud
+Este pipeline extrae noticias espaciales de la API de Spaceflight News, las procesa y las limpia con Apache Beam (Dataflow), las almacena en BigQuery y las visualiza con Looker Studio.
+
+## ⚙️ Tecnologias Utilizadas
+
+- ** 1️⃣ Cloud Functions → Ingesta de datos desde la API y publicación en Pub/Sub (100% serverless).
+- ** 2️⃣ Pub/Sub → Sistema de mensajería para manejar datos en tiempo real y desacoplar procesos.
+- ** 3️⃣ Dataflow (Apache Beam) → Procesa y enriquece los datos (palabras clave, clasificación) antes de enviarlos a BigQuery.
+- ** 4️⃣ BigQuery → Almacena y analiza grandes volúmenes de datos, con particionamiento y clustering para consultas rápidas.
+- ** 5️⃣ Cloud Composer (Airflow) → Orquesta el pipeline completo, programa tareas y monitorea fallos.
+- ** 6️⃣ Google Cloud Natural Language API → Análisis de texto para extraer entidades y temas principales.
+- ** 7️⃣ Looker Studio → Dashboards dinámicos para visualizar tendencias y patrones clave.
+
+Arquitectura PIPELINE 
+
+https://lucid.app/documents/embedded/230b2762-6f66-4fe1-8dac-260179ab6aaf
+
+Inteligencia Artificial utilizada
+Modelo Ia-ops
+Ver PDF
 
 
 
