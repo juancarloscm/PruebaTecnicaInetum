@@ -160,24 +160,96 @@ Los test unitarios son una parte esencial para mantener la calidad del pipeline 
 
 
 
+# 📊 Análisis de Datos del Pipeline
 
+## 📌 **Objetivo**
+El análisis de datos en el pipeline tiene como finalidad extraer información clave, identificar tendencias y generar insights útiles para la toma de decisiones.
 
+---
+## 🛠️ **Áreas de Análisis**
+| **Análisis**                   | **Descripción**                                          |
+|--------------------------------|----------------------------------------------------------|
+| Extracción de palabras clave   | Identificación de las 5 palabras más frecuentes en el contenido. |
+| Clasificación de artículos      | Clasificación automática en categorías (`Launch`, `Rocket`, `Space`). |
+| Identificación de entidades     | Reconocimiento de compañías y lugares mencionados.        |
+| Análisis de tendencias          | Identificación de patrones por categoría y fuente de noticias. |
+| Generación de insights diarios  | Reportes automatizados sobre el volumen y la actividad reciente. |
 
-## 📊 Análisis SQL
-### 🔹 **Tendencias de temas por mes** analisis_tendencias.sql 
+---
+## 📈 **Metodología de Análisis**
+### 1️⃣ **Extracción de Palabras Clave**
+Se utiliza un conteo de frecuencia de palabras para identificar las palabras clave más relevantes en el contenido de cada artículo.
 
-### 🔹 **Fuentes de noticias mas influyentes** fuentes_mas_influyentes.sql
+**Ejemplo de código:**
+```python
+import re
+from collections import Counter
 
-## 📈 Visualización en Looker Studio
-Conectar **BigQuery** con **Looker Studio** para crear un dashboards interactivo y visualizar tendencias en los datos.
+def extract_keywords(summary):
+    words = re.findall(r'\w+', summary.lower())
+    common_words = Counter(words).most_common(5)
+    return [word for word, _ in common_words]
+```
+**Descripción:** Devuelve las 5 palabras más comunes en el resumen del artículo.
 
-## 📌 Conclusión
-✔ **Pipeline optimizado con particionamiento y clustering en BigQuery**  
-✔ **Procesamiento escalable en Dataproc con Apache Spark**  
-✔ **Orquestación eficiente con Airflow en Cloud Composer**  
-✔ **Visualización intuitiva en Looker Studio**  
+---
+### 2️⃣ **Clasificación de Artículos por Tema**
+Se clasifica cada artículo en una categoría específica basada en palabras clave.
 
+**Ejemplo de código:**
+```python
+def classify_article(summary):
+    if "launch" in summary.lower():
+        return "Launch"
+    elif "rocket" in summary.lower():
+        return "Rocket"
+    elif "space" in summary.lower():
+        return "Space"
+    else:
+        return "General"
+```
+**Descripción:** Clasifica el artículo en `Launch`, `Rocket`, `Space` o `General`.
 
+---
+### 3️⃣ **Identificación de Entidades (Compañías y Lugares)**
+Se extraen entidades relevantes mencionadas en el contenido, como compañías (`NASA`, `SpaceX`) y lugares (`Florida`, `Mars`).
+
+**Ejemplo de código:**
+```python
+def identify_entities(summary):
+    companies = ["NASA", "SpaceX", "Boeing"]
+    places = ["Florida", "Texas", "Mars"]
+    found_companies = [c for c in companies if c.lower() in summary.lower()]
+    found_places = [p for p in places if p.lower() in summary.lower()]
+    return {"companies": found_companies, "places": found_places}
+```
+**Descripción:** Devuelve una lista de compañías y lugares mencionados en el resumen.
+
+---
+## 📊 **Visualización de Datos y Reportes**
+### Herramientas Utilizadas:
+- **Google BigQuery** para almacenamiento y consultas rápidas.
+- **Google Data Studio** para crear dashboards visuales.
+
+### Ejemplo de Consulta SQL en BigQuery:
+```sql
+SELECT category, COUNT(*) AS total_articles
+FROM `analitica-contact-center-dev.pos_analitica_ANALISIS.topic_trends`
+WHERE published_at BETWEEN '2025-01-01' AND '2025-01-31'
+GROUP BY category
+ORDER BY total_articles DESC;
+```
+**Descripción:** Consulta el número de artículos por categoría en enero de 2025.
+
+---
+## 🔄 **Automatización y Generación de Insights**
+1. **Datos diarios:** El pipeline genera reportes diarios automáticamente.
+2. **Visualización en tiempo real:** Los resultados se actualizan en dashboards de Google Data Studio.
+3. **Alertas y tendencias:** Identificación de patrones emergentes por categoría.
+
+---
+## ✅ **Conclusión**
+El análisis de datos del pipeline proporciona insights valiosos para comprender mejor las tendencias, detectar patrones clave y mejorar la toma de decisiones. Las herramientas utilizadas, como BigQuery y Data Studio, permiten realizar consultas rápidas y visualizar los resultados de manera efectiva.
 
 **OPCION 2**
 
