@@ -1,1 +1,83 @@
+# 🧪 Test Unitarios para el Pipeline de Datos
+
+## 📌 **Objetivo**
+Garantizar la calidad y el correcto funcionamiento del pipeline mediante la ejecución de test unitarios en las funciones clave. Esto asegura que cada módulo individual funcione como se espera y facilita la detección temprana de errores.
+
+---
+## 🛠️ **Áreas de Prueba**
+Los test unitarios cubren las siguientes áreas clave del pipeline:
+
+| **Módulo**                 | **Descripción del Test**                                    |
+|----------------------------|-------------------------------------------------------------|
+| Extracción de datos         | Verifica la conexión y respuesta de la API.                  |
+| Limpieza y deduplicación   | Asegura que no existan registros duplicados y que se eliminen columnas innecesarias. |
+| Análisis de palabras clave | Comprueba la correcta extracción de las palabras más frecuentes. |
+| Clasificación de artículos  | Verifica la asignación correcta de categorías (`Launch`, `Rocket`, `Space`). |
+| Carga a BigQuery           | Asegura que el esquema de datos sea compatible y la carga se realice sin errores. |
+
+---
+## 🧑‍💻 **Ejemplos de Test Unitarios**
+
+### 1️⃣ **Test de Extracción de Datos**
+```python
+import unittest
+import requests
+
+class TestDataExtraction(unittest.TestCase):
+    def test_api_response(self):
+        response = requests.get("https://api.spaceflightnewsapi.net/v4/articles")
+        self.assertEqual(response.status_code, 200, "La API no responde correctamente.")
+
+if __name__ == '__main__':
+    unittest.main()
+```
+**Descripción:** Verifica que la API responda con un código `200` (OK).
+
+---
+### 2️⃣ **Test de Limpieza y Deduplicación**
+```python
+import unittest
+from pyspark.sql import SparkSession
+
+class TestDataCleaning(unittest.TestCase):
+    def setUp(self):
+        self.spark = SparkSession.builder.appName("TestCleaning").getOrCreate()
+        self.data = [(1, "Article 1"), (1, "Article 1"), (2, "Article 2")]
+        self.df = self.spark.createDataFrame(self.data, ["id", "title"])
+
+    def test_remove_duplicates(self):
+        cleaned_df = self.df.dropDuplicates(["id"])
+        self.assertEqual(cleaned_df.count(), 2, "Eliminación de duplicados fallida.")
+
+if __name__ == '__main__':
+    unittest.main()
+```
+**Descripción:** Verifica que el proceso de limpieza elimine correctamente los registros duplicados.
+
+---
+### 3️⃣ **Test de Clasificación de Artículos**
+```python
+import unittest
+from classify import classify_article  # Supongamos que esta función clasifica artículos
+
+class TestClassification(unittest.TestCase):
+    def test_classification(self):
+        self.assertEqual(classify_article("This is a rocket launch"), "Launch", "Clasificación incorrecta.")
+        self.assertEqual(classify_article("Space mission to Mars"), "Space", "Clasificación incorrecta.")
+
+if __name__ == '__main__':
+    unittest.main()
+```
+**Descripción:** Verifica que la función de clasificación asigne la categoría correcta.
+
+---
+## 📦 **Estrategia de Ejecución**
+1. **Automatización:** Los test unitarios se ejecutan automáticamente en cada nueva versión del pipeline utilizando un sistema de integración continua (CI/CD).
+2. **Frecuencia:** Ejecución diaria o en cada cambio significativo en el código.
+3. **Resultados:** Los resultados se registran y notifican al equipo.
+
+---
+## ✅ **Conclusión**
+Los test unitarios son una parte esencial para mantener la calidad del pipeline de datos. Detectan errores tempranamente, aseguran la estabilidad del sistema y facilitan el mantenimiento a largo plazo.
+
 
