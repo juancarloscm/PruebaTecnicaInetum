@@ -1,1 +1,65 @@
+# 📦 Sistema de Backup y Recuperación
+
+## 🎯 **Objetivo**
+Garantizar la continuidad del pipeline mediante un sistema de respaldo y recuperación rápida, minimizando la pérdida de datos y tiempo de inactividad.
+
+---
+## ⚠️ **Identificación de Riesgos**
+| **Riesgo**                        | **Descripción**                                        |
+|------------------------------------|--------------------------------------------------------|
+| Fallo en la extracción de datos    | La API no responde o cambia su estructura.             |
+| Pérdida de datos en Cloud Storage  | Archivos borrados o corrompidos.                       |
+| Fallo en Dataproc (Spark)          | Error en la ejecución de tareas o falta de recursos.   |
+| Fallo en la carga a BigQuery       | Datos incompletos o errores de formato.                |
+| Error en la automatización (Airflow)| DAGs fallidos o problemas de conectividad.             |
+
+---
+## 🛡️ **Medidas Preventivas y Correctivas**
+
+### 🔄 **Backup y Recuperación Automática**
+- **Backup Diario**: Datos intermedios y tablas de BigQuery respaldados automáticamente en **Google Cloud Storage**.
+- **Restauración Automática**: Recuperación desde el backup más reciente en caso de fallo.
+
+### ⚙️ **Redundancia y Alta Disponibilidad**
+- **Google Cloud Storage**: Almacenamiento con múltiples réplicas.
+- **BigQuery**: Redundancia interna y particiones para consultas rápidas.
+
+### 📈 **Monitoreo y Alertas**
+- **Google Cloud Monitoring** para detectar fallos.
+- **Notificaciones** en tiempo real por correo, Slack o Google Chat.
+
+---
+## 🔄 **Procedimientos de Recuperación**
+### 1️⃣ **Fallo en la extracción de datos**
+- **Acción:** Reintentar la tarea después de 5 minutos.
+- **Fallback:** Recuperar datos de fuente alternativa si está disponible.
+
+### 2️⃣ **Pérdida de datos en Cloud Storage**
+- **Acción:** Restaurar desde el backup más reciente.
+- **Prevención:** Activar Object Versioning en Cloud Storage.
+
+### 3️⃣ **Fallo en Dataproc (Spark)**
+- **Acción:** Reintentar el trabajo hasta 3 veces.
+- **Fallback:** Escalar el cluster de Dataproc.
+
+### 4️⃣ **Error en la carga a BigQuery**
+- **Acción:** Corregir formato de datos y reintentar.
+- **Prevención:** Validar el esquema antes de cargar.
+
+---
+## 👥 **Roles y Responsabilidades**
+| **Rol**               | **Responsabilidad**                                      |
+|-----------------------|---------------------------------------------------------|
+| Equipo de Datos       | Gestión y recuperación de datos.                         |
+| Equipo de DevOps      | Monitoreo y soporte del entorno de ejecución.             |
+| Gerencia              | Evaluación del impacto y toma de decisiones estratégicas. |
+
+---
+## 📊 **Resumen Visual (sugerido)**
+**1. Detección de error** → **2. Verificación de backups** → **3. Restauración automática** → **4. Notificación al equipo** → **5. Reanudación del pipeline**
+
+---
+## ✅ **Conclusión**
+El sistema de backup y recuperación garantiza la disponibilidad de datos y la continuidad operativa del pipeline, minimizando riesgos y tiempos de recuperación en caso de fallos.
+
 
