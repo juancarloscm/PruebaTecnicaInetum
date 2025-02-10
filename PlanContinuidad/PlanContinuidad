@@ -1,118 +1,69 @@
-## Plan de Contingencia para el Pipeline de Datos
+# Plan de Contingencia para el Pipeline de Datos
 
-1. Objetivo del Plan
-    El objetivo de este plan de contingencia es garantizar la continuidad operativa del pipeline de datos, minimizando el tiempo de inactividad y reduciendo 
-    el riesgo de pérdida de datos. Esto se logra mediante la identificación de riesgos, la implementación de medidas preventivas, y la definición de procedimientos claros para la recuperación rápida.
+## 📌 Objetivo del Plan
+El objetivo de este plan de contingencia es garantizar la continuidad operativa del pipeline de datos, minimizando el tiempo de inactividad y reduciendo el riesgo de pérdida de datos. Esto se logra mediante la identificación de riesgos, la implementación de medidas preventivas, y la definición de procedimientos claros para la recuperación rápida.
 
-2. Identificación de Riesgos
-
+## ⚠️ Identificación de Riesgos
 A continuación, se describen los principales riesgos que podrían afectar el pipeline de datos:
 
-  Riesgo:fallo en la extracción de datos
-  Descripción:
+| **Riesgo**                        | **Descripción**                                        | **Impacto**  |
+|------------------------------------|--------------------------------------------------------|--------------|
+| Fallo en la extracción de datos    | La API no responde o cambia su estructura.             | Alto         |
+| Pérdida de datos en Cloud Storage  | Archivos borrados o corrompidos.                       | Alto         |
+| Fallo en Dataproc (Spark)          | Error en la ejecución de tareas o falta de recursos.   | Medio        |
+| Fallo en la carga a BigQuery       | Datos incompletos o errores de formato.                | Alto         |
+| Error en la automatización (Airflow)| DAGs fallidos o problemas de conectividad.             | Medio        |
 
-Impacto
+## 🛡️ Medidas Preventivas y Correctivas
 
-Fallo en la extracción de datos
+### 🔄 Backup y Recuperación
+- **Backup Diario en Cloud Storage:** Respaldo automatizado de datos intermedios y tablas de BigQuery.
+- **Plan de Restauración:** Restaurar datos desde el backup más reciente en caso de pérdida.
 
-La API no responde o cambia su estructura.
+### ⚙️ Redundancia y Alta Disponibilidad
+- **Google Cloud Storage:** Múltiples réplicas para asegurar alta disponibilidad.
+- **BigQuery:** Redundancia interna para datos estructurados.
 
-Alto
+### 📈 Monitoreo y Alertas (Cloud Monitoring)
+- Configuración de alertas para detectar fallos en el pipeline.
+- Notificaciones en tiempo real por correo, Slack o Google Chat.
+- Políticas de alertas personalizadas basadas en tiempo de ejecución y errores críticos.
 
-Pérdida de datos en Cloud Storage
+## 🚨 Procedimientos de Recuperación
 
-Archivos borrados o corrompidos.
+### Escenario 1: Fallo en la extracción de datos (API no responde)
+- **Acción inmediata:** Detener el DAG y reintentar después de 5 minutos.
+- **Fallback:** Notificar al equipo y recuperar datos de una fuente alternativa si está disponible.
 
-Alto
+### Escenario 2: Pérdida de datos en Cloud Storage
+- **Acción inmediata:** Restaurar los datos desde el backup más reciente.
+- **Prevención:** Habilitar Object Versioning en Cloud Storage.
 
-Fallo en Dataproc (Spark)
+### Escenario 3: Fallo en Dataproc (Spark)
+- **Acción inmediata:** Reintentar el trabajo hasta 3 veces.
+- **Fallback:** Escalar el cluster de Dataproc o reprogramar la tarea.
 
-Error en la ejecución de tareas o falta de recursos.
+### Escenario 4: Error en la carga a BigQuery
+- **Acción inmediata:** Corregir el formato de datos y reintentar la carga.
+- **Prevención:** Validación previa del esquema de datos antes de cargar.
 
-Medio
+## 👥 Roles y Responsabilidades
 
-Fallo en la carga a BigQuery
+| **Rol**               | **Responsabilidad**                                      |
+|-----------------------|---------------------------------------------------------|
+| Equipo de Datos       | Gestión y recuperación de datos.                         |
+| Equipo de DevOps      | Monitoreo y soporte del entorno de ejecución.             |
+| Gerencia              | Evaluación del impacto y toma de decisiones estratégicas. |
 
-Datos incompletos o errores de formato.
-
-Alto
-
-Error en la automatización (Airflow)
-
-DAGs fallidos o problemas de conectividad.
-
-Medio
-
-3. Medidas Preventivas y Correctivas
-
-3.1 Backup y Recuperación
-
-Backup Diario en Cloud Storage: Respaldo automatizado de datos intermedios y tablas de BigQuery.
-
-Plan de Restauración: Restaurar datos desde el backup más reciente en caso de pérdida.
-
-3.2 Redundancia y Alta Disponibilidad
-
-Google Cloud Storage: Múltiples réplicas para asegurar alta disponibilidad.
-
-BigQuery: Redundancia interna para datos estructurados.
-
-3.3 Monitoreo y Alertas (Cloud Monitoring)
-
-Configuración de alertas para detectar fallos en el pipeline.
-
-Notificaciones en tiempo real por correo, Slack o Google Chat.
-
-Políticas de alertas personalizadas basadas en tiempo de ejecución y errores críticos.
-
-4. Procedimientos de Recuperación
-
-4.1 Escenario 1: Fallo en la extracción de datos (API no responde)
-
-Acción inmediata: Detener el DAG y reintentar después de 5 minutos.
-Fallback: Notificar al equipo y recuperar datos de una fuente alternativa si está disponible.
-
-4.2 Escenario 2: Pérdida de datos en Cloud Storage
-
-Acción inmediata: Restaurar los datos desde el backup más reciente.
-Prevención: Habilitar Object Versioning en Cloud Storage.
-
-4.3 Escenario 3: Fallo en Dataproc (Spark)
-
-Acción inmediata: Reintentar el trabajo hasta 3 veces.
-Fallback: Escalar el cluster de Dataproc o reprogramar la tarea.
-
-4.4 Escenario 4: Error en la carga a BigQuery
-
-Acción inmediata: Corregir el formato de datos y reintentar la carga.
-Prevención: Validación previa del esquema de datos antes de cargar.
-
-5. Roles y Responsabilidades
-
-Rol
-
-Responsabilidad
-
-Equipo de Datos
-
-Gestión y recuperación de datos.
-
-Equipo de DevOps
-
-Monitoreo y soporte del entorno de ejecución.
-
-Gerencia
-
-Evaluación del impacto y toma de decisiones estratégicas.
-
-6. Resumen Visual del Plan
-
+## 🔍 Resumen Visual del Plan
 Un diagrama de flujo que ilustra el proceso del plan de contingencia, desde la identificación de un fallo hasta la restauración de datos.
 
-Diagrama (sugerido):
+---
+### 🗂️ Diagrama (sugerido):
+1. **Detección de error** → 2. **Verificación de backups** → 3. **Restauración automática** → 4. **Notificación al equipo** → 5. **Reanudación del pipeline**
 
-Detección de error → 2. Verificación de backups → 3. Restauración automática → 4. Notificación al equipo → 5. Reanudación del pipeline
+---
 
-7. Conclusión
-
+## 📋 Conclusión
 Este plan de contingencia establece una estrategia integral para asegurar la continuidad del pipeline de datos. Las medidas descritas minimizan el impacto de los fallos y garantizan la rápida recuperación del sistema, manteniendo la integridad y disponibilidad de los datos.
+
