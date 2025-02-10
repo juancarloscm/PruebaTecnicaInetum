@@ -1,1 +1,155 @@
+# 🚀 Agente Autónomo en Google Cloud Platform (GCP)
+
+Este proyecto implementa un **agente autónomo basado en GPT** que se integra con **Google Cloud Platform (GCP)** para realizar las siguientes tareas:
+- **Ingesta de datos desde BigQuery**
+- **Análisis y enriquecimiento de datos** usando Google Cloud Natural Language y GPT
+- **Toma de decisiones automáticas** y generación de alertas
+- **Actualización de dashboards en Looker Studio**
+
+El agente está desplegado en **Cloud Run** y se activa mediante eventos de **Pub/Sub**.
+
+---
+## 🛠️ Arquitectura
+1. **Pub/Sub:** Recibe eventos y activa el agente autónomo.
+2. **Cloud Run:** Ejecuta el agente como un servicio serverless.
+3. **BigQuery:** Fuente de datos para el análisis.
+4. **Google Cloud Natural Language:** Enriquecimiento del texto mediante la identificación de palabras clave y entidades.
+5. **GPT (OpenAI):** Análisis avanzado y generación de respuestas.
+
+### **Flujo de Trabajo:**
+1. **Ingesta y Limpieza:** Obtención de datos desde BigQuery.
+2. **Enriquecimiento:** Extracción de palabras clave y entidades usando Google Cloud Natural Language.
+3. **Análisis de Tendencias:** GPT analiza el contenido para detectar patrones.
+4. **Toma de Decisiones:** Se generan alertas o se actualiza el dashboard en Looker Studio.
+5. **Respuesta:** El agente responde al evento y finaliza el proceso.
+
+---
+## 📂 Estructura del Proyecto
+```
+agente_autonomo/
+  ├── main.py                 # Script principal del agente
+  ├── Dockerfile              # Archivo para construir la imagen de Docker
+  ├── requirements.txt        # Dependencias del proyecto
+```
+
+---
+## 📄 Código Principal (`main.py`)
+```python
+from flask import Flask, request, jsonify
+import openai
+from google.cloud import bigquery, language_v1
+
+# Inicialización
+app = Flask(__name__)
+openai.api_key = "TU_API_KEY"
+bq_client = bigquery.Client()
+nlp_client = language_v1.LanguageServiceClient()
+
+# Función para consultar BigQuery
+def consultar_bigquery(query):
+    query_job = bq_client.query(query)
+    result = query_job.result()
+    return [dict(row.items()) for row in result]
+
+# Función para analizar texto con Google Cloud Natural Language
+def extraer_palabras_clave(texto):
+    document = language_v1.Document(content=texto, type_=language_v1.Document.Type.PLAIN_TEXT)
+    response = nlp_client.analyze_entities(document=document)
+    return [entity.name for entity in response.entities if entity.salience > 0.1]
+
+# Función para usar GPT y analizar tendencias
+def analizar_tendencias(datos):
+    texto = f"Los datos obtenidos son: {datos}. ¿Qué tendencias importantes puedes identificar?"
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=texto,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
+# Endpoint principal para Cloud Run
+@app.route("/", methods=["POST"])
+def recibir_evento():
+    mensaje = request.get_json()
+    
+    # Paso 1: Consultar BigQuery
+    query = "SELECT * FROM `analitica-contact-center-dev.dataset.tu_tabla` LIMIT 10"
+    datos = consultar_bigquery(query)
+    print(f"📊 Datos obtenidos de BigQuery: {datos}")
+
+    # Paso 2: Enriquecer los datos con palabras clave
+    for dato in datos:
+        if "contenido" in dato:
+            keywords = extraer_palabras_clave(dato["contenido"])
+            dato["palabras_clave"] = keywords
+    print(f"📝 Datos enriquecidos: {datos}")
+
+    # Paso 3: Análisis de tendencias con GPT
+    respuesta_gpt = analizar_tendencias(datos)
+    print(f"📈 Respuesta del análisis: {respuesta_gpt}")
+
+    # Paso 4: Decisiones y acciones automáticas
+    if "alerta" in respuesta_gpt.lower():
+        print("⚠️ Alerta detectada. Enviando notificación...")
+    else:
+        print("✅ Todo está en orden.")
+
+    return jsonify({"status": "OK", "message": "Evento procesado correctamente"})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
+```
+
+---
+## 🐳 Dockerfile
+```Dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY . /app
+RUN pip install flask google-cloud-bigquery google-cloud-language openai
+CMD ["python", "main.py"]
+```
+
+---
+## 🚀 Despliegue en Cloud Run
+1. **Construir la imagen de Docker:**
+   ```bash
+   gcloud builds submit --tag gcr.io/tu-proyecto/agente-autonomo
+   ```
+2. **Desplegar en Cloud Run:**
+   ```bash
+   gcloud run deploy agente-autonomo \
+       --image gcr.io/tu-proyecto/agente-autonomo \
+       --platform managed \
+       --region us-central1 \
+       --allow-unauthenticated
+   ```
+
+---
+## 📢 Integración con Pub/Sub
+1. **Crear un tema de Pub/Sub:**
+   ```bash
+   gcloud pubsub topics create agente-eventos
+   ```
+2. **Configurar una suscripción para Cloud Run:**
+   ```bash
+   gcloud pubsub subscriptions create agente-suscripcion \
+       --topic agente-eventos \
+       --push-endpoint=https://<YOUR-CLOUD-RUN-URL> \
+       --ack-deadline 10
+   ```
+3. **Publicar un mensaje en Pub/Sub:**
+   ```bash
+   gcloud pubsub topics publish agente-eventos --message "Evento de prueba"
+   ```
+
+---
+## 📊 Monitoreo y Logs
+Puedes revisar los logs del agente en Cloud Run:
+```bash
+gcloud logs read --service=agente-autonomo
+```
+
+---
+
 
