@@ -173,6 +173,25 @@ Ver PDF
 - ** Automatización diaria para mantener los datos respaldados y seguros.
 - ** Restauración manual en caso de fallo.
 
+----------------------------
+🛠 2. Estrategia de Almacenamiento y Búsqueda
+- ** a. Almacenamiento
+- ** Herramientas:
+
+- ** Google Cloud Storage (intermedios y backups)
+- ** Google BigQuery (datos estructurados para consultas rápidas)
+- ** Formato recomendado:
+- ** JSON para almacenamiento bruto (backup).
+- ** Parquet para datos procesados y comprimidos (más eficiente para análisis en BigQuery y Spark).
+
+
+- ** b. Estrategia de Búsqueda
+- ** 1. Google BigQuery (para consultas avanzadas):
+
+- ** Consulta rápida: Usa índices y particiones en BigQuery para acelerar las consultas.
+- ** Particiona por fecha (published_at) para reducir el volumen escaneado.
+- ** Clustering: Clustering por category y news_site para mejorar el rendimiento.
+
 
 
 
