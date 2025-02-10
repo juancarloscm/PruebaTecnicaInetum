@@ -167,6 +167,12 @@ Ver PDF
 - ** Falta de espacio en Cloud Storage.
 - ** Fallos de importación en BigQuery.
 
+## Objetivo del DAG de Airflow:
+- ** Backup de datos intermedios y tablas de BigQuery.
+- ** Almacenar los backups en Cloud Storage.
+- ** Automatización diaria para mantener los datos respaldados y seguros.
+- ** Restauración manual en caso de fallo.
+
 
 
 
