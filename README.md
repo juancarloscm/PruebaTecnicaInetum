@@ -192,6 +192,35 @@ Ver PDF
 - ** Particiona por fecha (published_at) para reducir el volumen escaneado.
 - ** Clustering: Clustering por category y news_site para mejorar el rendimiento.
 
+## 🎯 Objetivo del Plan de Contingencia
+- ** Identificar riesgos críticos que puedan afectar el pipeline.
+- ** Implementar medidas preventivas y correctivas para mitigar los riesgos.
+- ** Definir procedimientos de recuperación rápida en caso de fallo.
+- ** 🛠️ 1. Identificación de Riesgos
+- **        Aquí están los riesgos más relevantes para tu pipeline:
+
+- **        Riesgo	Descripción	Impacto
+- **        Fallo en la extracción de datos	La API no responde o cambia su estructura.	Alto
+- **        Pérdida de datos en Cloud Storage	Archivos borrados o corrompidos.	Alto
+- **        Fallo en Dataproc (Spark)	Error en la ejecución de tareas o falta de recursos.	Medio
+- **        Fallo en la carga a BigQuery	Datos incompletos o errores de formato.	Alto
+- **        Error en la automatización (Airflow)	DAGs fallidos o problemas de conectividad.	Medio
+- **🛡️ 2. Estrategia de Mitigación y Procedimientos Correctivos
+- **       a. Backup y Recuperación
+- **          Backup Diario en Cloud Storage:
+- **          Automatizado mediante Airflow y Cloud Scheduler.
+- **          Respalda datos intermedios y tablas de BigQuery.
+- ** Plan de Restauración:
+- **  Restaurar datos desde el backup más reciente en caso de pérdida (como explicamos en el DAG data_recovery_pipeline).
+- **       b. Redundancia y Alta Disponibilidad
+- **          Google Cloud Storage asegura alta disponibilidad con múltiples réplicas.
+- **          BigQuery es una plataforma sin servidor con redundancia interna.
+- **       c. Monitoreo y Alertas (Cloud Monitoring)
+- **          Configura Google Cloud Monitoring para detectar fallos en el pipeline.
+- **          Notificaciones en tiempo real: Por correo, Slack o Google Chat.
+- **          Política de alertas personalizadas basada en:
+- **          Tiempo de ejecución prolongado.
+- **          Errores en Dataproc o BigQuery.
 
 
 
