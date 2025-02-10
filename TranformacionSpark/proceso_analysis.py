@@ -1,66 +1,73 @@
+# 🔍 Explicación del Código
+# Tokenización (Tokenizer): Divide el contenido del resumen (summary) en palabras.
+# Remover Stopwords (StopWordsRemover): Filtra palabras comunes que no aportan valor.
+# CountVectorizer: Calcula la frecuencia de las palabras en cada documento.
+# TF-IDF (IDF): Calcula la relevancia de cada palabra.
+# Selección de Palabras Clave: Se eligen las 5 palabras con mayor valor de TF-IDF para cada resumen.
+# 📊 Beneficios de Usar TF-IDF
+# Mayor precisión en la identificación de palabras clave.
+# Relevancia contextual: Evita que palabras comunes se conviertan en "palabras clave".
+#Optimización para análisis avanzado o entrenamiento de modelos de Machine Learning.
+   
+
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, udf, lower
-from pyspark.sql.types import StringType, MapType
-import re
-from collections import Counter
+from pyspark.ml.feature import Tokenizer, StopWordsRemover, CountVectorizer, IDF
+from pyspark.sql.functions import col
+
 
 # Crear sesión de Spark
-spark = SparkSession.builder.appName("PerformAnalysis").getOrCreate()
+spark = SparkSession.builder.appName("PerformAnalysisTFIDF").getOrCreate()
 
 # Ruta de entrada y salida (Cloud Storage)
 input_path = "gs://buckets-aws/processed_data/cleaned_data.parquet"
-output_path = "gs://buckets-aws/processed_data/analyzed_data.parquet"
+output_path = "gs://buckets-aws/processed_data/analyzed_data_tfidf.parquet"
 
 # Leer datos desde Cloud Storage
 df = spark.read.parquet(input_path)
 
-# 🛠 Funciones de análisis
-def extract_keywords(summary):
-    """Extrae las 5 palabras más comunes del resumen."""
-    words = re.findall(r'\w+', summary.lower()) if summary else []
-    common_words = Counter(words).most_common(5)
-    return ", ".join([word for word, _ in common_words])
+# Paso 1: Tokenización
+tokenizer = Tokenizer(inputCol="summary", outputCol="words")
+words_df = tokenizer.transform(df)
 
-def classify_article(summary):
-    """Clasifica el artículo en Launch, Rocket, Space o General."""
-    if "launch" in summary.lower():
-        return "Launch"
-    elif "rocket" in summary.lower():
-        return "Rocket"
-    elif "space" in summary.lower():
-        return "Space"
-    else:
-        return "General"
+# Paso 2: Remover Stopwords
+remover = StopWordsRemover(inputCol="words", outputCol="filtered_words")
+filtered_df = remover.transform(words_df)
 
-def identify_entities(summary):
-    """Identifica compañías y lugares mencionados en el resumen."""
-    companies = ["NASA", "SpaceX", "Boeing", "Blue Origin"]
-    places = ["Florida", "Texas", "California", "Mars"]
-    summary_lower = summary.lower() if summary else ""
-    found_companies = [c for c in companies if c.lower() in summary_lower]
-    found_places = [p for p in places if p.lower() in summary_lower]
-    return {"companies": ", ".join(found_companies), "places": ", ".join(found_places)}
+# Paso 3: Calcular frecuencia de términos (CountVectorizer)
+vectorizer = CountVectorizer(inputCol="filtered_words", outputCol="raw_features")
+vectorized_model = vectorizer.fit(filtered_df)
+vectorized_df = vectorized_model.transform(filtered_df)
 
-# Registrar las funciones como UDFs (User Defined Functions)
-spark.udf.register("extract_keywords", extract_keywords, StringType())
-spark.udf.register("classify_article", classify_article, StringType())
-spark.udf.register("identify_entities", identify_entities, MapType(StringType(), StringType()))
+# Paso 4: Calcular TF-IDF
+idf = IDF(inputCol="raw_features", outputCol="tfidf_features")
+idf_model = idf.fit(vectorized_df)
+tfidf_df = idf_model.transform(vectorized_df)
 
-# Aplicar las UDFs para el análisis
-analyzed_df = (
-    df.withColumn("keywords", udf(extract_keywords, StringType())(df.summary))
-      .withColumn("category", udf(classify_article, StringType())(df.summary))
-      .withColumn("entities", udf(identify_entities, MapType(StringType(), StringType()))(df.summary))
-)
+# Paso 5: Seleccionar las palabras clave más relevantes
+def extract_top_keywords(tfidf_vector, vocabulary, num_keywords=5):
+    """Extrae las palabras con mayor valor TF-IDF."""
+    if tfidf_vector is None:
+        return []
+    indices = tfidf_vector.indices
+    values = tfidf_vector.values
+    sorted_indices = sorted(range(len(values)), key=lambda k: -values[k])[:num_keywords]
+    keywords = [vocabulary[indices[i]] for i in sorted_indices]
+    return ", ".join(keywords)
+
+# Crear una lista de palabras clave basada en TF-IDF
+vocabulary = vectorized_model.vocabulary
+spark.udf.register("extract_top_keywords", lambda vec: extract_top_keywords(vec, vocabulary), StringType())
+
+# Aplicar la función para generar las palabras clave
+tfidf_df = tfidf_df.withColumn("keywords", udf(lambda vec: extract_top_keywords(vec, vocabulary), StringType())(col("tfidf_features")))
 
 # Mostrar el resultado
-analyzed_df.show(truncate=False)
+tfidf_df.select("summary", "keywords").show(truncate=False)
 
 # Guardar el resultado en formato Parquet en Cloud Storage
-analyzed_df.write.mode("overwrite").parquet(output_path)
+tfidf_df.write.mode("overwrite").parquet(output_path)
 
-print(f"Análisis completado. Datos guardados en: {output_path}")
+print(f"Análisis completado con TF-IDF. Datos guardados en: {output_path}")
 
 # Finalizar la sesión de Spark
 spark.stop()
-
